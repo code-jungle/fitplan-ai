@@ -41,7 +41,7 @@ export function Footer() {
 
         <div className="border-t border-border/30 mt-8 pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 FitPlanAI. Todos os direitos reservados.
+            © 2025 FitPlanAI powered by CodeJungle.
           </p>
         </div>
       </div>
