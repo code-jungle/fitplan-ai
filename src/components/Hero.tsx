@@ -32,8 +32,8 @@ export function Hero() {
           {/* Main headline */}
           <div className="mb-8 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-orbitron font-bold mb-4 leading-tight">
-              Seu Assistente{" "}
-              <span className="text-gradient">Pessoal de IA</span>
+              Seu assistente{" "}
+              <span className="text-gradient">fitness de IA</span>
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed px-4">
               Planos personalizados de dieta e treino que se adaptarão ao seu progresso em tempo real. 
@@ -49,11 +49,6 @@ export function Hero() {
                 Experimente Grátis por 7 Dias
               </CustomButton>
             </Link>
-            
-            <CustomButton variant="glass" size="lg" className="w-full text-lg py-6">
-              <Play className="w-5 h-5 mr-2" />
-              Ver Como Funciona
-            </CustomButton>
           </div>
 
           {/* IA Feature Highlight */}
