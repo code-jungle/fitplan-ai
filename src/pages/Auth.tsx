@@ -132,13 +132,7 @@ export default function Auth() {
               </div>
             </div>
 
-            {!isLogin && (
-              <div className="text-sm text-muted-foreground">
-                <p>Ao criar uma conta, você concorda com nossos</p>
-                <a href="#" className="text-primary hover:underline">Termos de Uso</a> e{" "}
-                <a href="#" className="text-primary hover:underline">Política de Privacidade</a>
-              </div>
-            )}
+           
 
             <CustomButton type="submit" size="lg" className="w-full" disabled={loading}>
               {loading ? "Processando..." : (isLogin ? "Entrar" : "Começar teste gratuito")}
