@@ -1,1 +1,7 @@
 project_id = "mwwegzxljanphfwryrql"
+
+[functions.generate-meal-plan]
+verify_jwt = true
+
+[functions.generate-workout-plan]
+verify_jwt = true

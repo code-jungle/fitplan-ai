@@ -5,15 +5,52 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Mail, Lock, User, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
+  const [loading, setLoading] = useState(false);
+  
+  const navigate = useNavigate();
+  const { user, signIn, signUp } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already logged in
+  if (user) {
+    navigate('/dashboard');
+    return null;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement authentication logic
-    console.log("Authentication form submitted");
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await signIn(formData.email, formData.password);
+        if (!error) {
+          navigate('/dashboard');
+        }
+      } else {
+        const { error } = await signUp(formData.email, formData.password, formData.name);
+        if (!error) {
+          setIsLogin(true);
+        }
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -55,6 +92,8 @@ export default function Auth() {
                     type="text"
                     placeholder="Seu nome completo"
                     className="pl-10 bg-input/50 border-border/50"
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
                     required
                   />
                 </div>
@@ -70,6 +109,8 @@ export default function Auth() {
                   type="email"
                   placeholder="seu@email.com"
                   className="pl-10 bg-input/50 border-border/50"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   required
                 />
               </div>
@@ -84,6 +125,8 @@ export default function Auth() {
                   type="password"
                   placeholder="••••••••"
                   className="pl-10 bg-input/50 border-border/50"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
                   required
                 />
               </div>
@@ -97,8 +140,8 @@ export default function Auth() {
               </div>
             )}
 
-            <CustomButton type="submit" size="lg" className="w-full">
-              {isLogin ? "Entrar" : "Começar teste gratuito"}
+            <CustomButton type="submit" size="lg" className="w-full" disabled={loading}>
+              {loading ? "Processando..." : (isLogin ? "Entrar" : "Começar teste gratuito")}
             </CustomButton>
 
             {isLogin && (

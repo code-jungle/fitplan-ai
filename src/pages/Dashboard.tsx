@@ -2,6 +2,8 @@ import { CustomButton } from "@/components/ui/custom-button";
 import { Logo } from "@/components/Logo";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { 
   Activity,
   Apple,
@@ -11,10 +13,20 @@ import {
   Target,
   TrendingUp,
   User,
-  Zap
+  Zap,
+  LogOut
 } from "lucide-react";
 
 export default function Dashboard() {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
   return (
     <div className="min-h-screen bg-gradient-secondary">
       {/* Header */}
@@ -26,6 +38,10 @@ export default function Dashboard() {
               <User className="w-4 h-4" />
               Perfil
             </CustomButton>
+            <CustomButton variant="ghost" size="sm" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4" />
+              Sair
+            </CustomButton>
           </div>
         </div>
       </header>
@@ -34,7 +50,7 @@ export default function Dashboard() {
         {/* Welcome section */}
         <div className="mb-8">
           <h1 className="text-3xl font-orbitron font-bold text-foreground mb-2">
-            Olá, <span className="text-gradient">João</span>! 👋
+            Olá, <span className="text-gradient">{userName}</span>! 👋
           </h1>
           <p className="text-muted-foreground">
             Vamos continuar sua jornada de transformação hoje
