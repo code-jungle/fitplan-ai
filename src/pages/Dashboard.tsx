@@ -16,6 +16,7 @@ import {
   Zap,
   LogOut
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -38,6 +39,16 @@ export default function Dashboard() {
               <User className="w-4 h-4" />
               Perfil
             </CustomButton>
+            <Link to="/subscription">
+              <CustomButton variant="outline" size="sm">
+                Assinatura
+              </CustomButton>
+            </Link>
+            <Link to="/progress">
+              <CustomButton variant="outline" size="sm">
+                Progresso
+              </CustomButton>
+            </Link>
             <CustomButton variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4" />
               Sair
