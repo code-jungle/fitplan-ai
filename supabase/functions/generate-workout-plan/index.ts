@@ -204,9 +204,9 @@ function determineWorkoutIntensity(activityLevel: string, goal: string): string 
   let baseIntensity = intensityMap[activityLevel] || 'beginner';
   
   // Ajustar baseado no objetivo
-  if (goal === 'muscle_gain' && baseIntensity === 'beginner') {
+  if ((goal === 'muscle_gain' || goal === 'ganho_massa') && baseIntensity === 'beginner') {
     baseIntensity = 'intermediate';
-  } else if (goal === 'weight_loss' && baseIntensity === 'advanced') {
+  } else if ((goal === 'weight_loss' || goal === 'perda_peso') && baseIntensity === 'advanced') {
     baseIntensity = 'intermediate';
   }
   
@@ -402,6 +402,36 @@ function generateWorkoutRecommendations(workoutType: string, goal: string, injur
       "Combine diferentes tipos de cardio",
       "Monitore sua respiração"
     ],
+    flexibility: [
+      "Alongue após o aquecimento",
+      "Mantenha cada alongamento por 20-30 segundos",
+      "Não force além do confortável",
+      "Respire profundamente durante o alongamento"
+    ],
+    mixed: [
+      "Combine diferentes tipos de exercícios",
+      "Varie a intensidade ao longo da semana",
+      "Inclua dias de recuperação ativa",
+      "Balance cardio e força"
+    ],
+    yoga: [
+      "Foque na respiração",
+      "Respeite seus limites",
+      "Mantenha as posturas com estabilidade",
+      "Pratique regularmente para melhores resultados"
+    ],
+    pilates: [
+      "Controle o movimento com o core",
+      "Mantenha a precisão em cada exercício",
+      "Foque na respiração controlada",
+      "Progrida gradualmente"
+    ],
+    crossfit: [
+      "Priorize a técnica sobre a velocidade",
+      "Escale os exercícios conforme necessário",
+      "Mantenha alta intensidade",
+      "Inclua dias de recuperação"
+    ],
     weight_loss: [
       "Mantenha alta intensidade",
       "Reduza o descanso entre exercícios",
@@ -418,12 +448,12 @@ function generateWorkoutRecommendations(workoutType: string, goal: string, injur
 
   let selectedRecommendations = [...recommendations.general];
   
-  if (workoutType) {
-    selectedRecommendations.push(...(recommendations[workoutType] || []));
+  if (workoutType && recommendations[workoutType]) {
+    selectedRecommendations.push(...recommendations[workoutType]);
   }
   
-  if (goal) {
-    selectedRecommendations.push(...(recommendations[goal] || []));
+  if (goal && recommendations[goal]) {
+    selectedRecommendations.push(...recommendations[goal]);
   }
   
   return selectedRecommendations;

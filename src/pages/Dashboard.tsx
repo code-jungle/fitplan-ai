@@ -120,9 +120,9 @@ export default function Dashboard() {
     
     // Ajustar baseado no objetivo
     const primaryGoal = dashboardData.profile.goals?.[0];
-    if (primaryGoal === 'weight_loss') {
+    if (primaryGoal === 'weight_loss' || primaryGoal === 'perda_peso') {
       return Math.round(dailyCalories * 0.85); // Déficit de 15%
-    } else if (primaryGoal === 'muscle_gain') {
+    } else if (primaryGoal === 'muscle_gain' || primaryGoal === 'ganho_massa') {
       return Math.round(dailyCalories * 1.1); // Superávit de 10%
     }
     

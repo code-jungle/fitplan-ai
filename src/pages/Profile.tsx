@@ -31,7 +31,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { usePWA } from "@/hooks/use-pwa";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface UserProfile {
   personalInfo: {
@@ -44,15 +44,15 @@ interface UserProfile {
     activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   };
   fitnessGoals: {
-    primary: 'weight_loss' | 'muscle_gain' | 'maintenance' | 'strength' | 'endurance';
+    primary: 'weight_loss' | 'muscle_gain' | 'maintenance' | 'strength' | 'endurance' | 'flexibility' | 'general_fitness';
     secondary: string[];
     targetWeight?: number;
     targetDate?: string;
   };
   preferences: {
-    dietType: 'balanced' | 'low_carb' | 'high_protein' | 'vegetarian' | 'vegan' | 'keto';
-    workoutType: 'strength' | 'cardio' | 'flexibility' | 'mixed';
-    workoutDuration: '30min' | '45min' | '60min' | '90min';
+    dietType: 'balanced' | 'low_carb' | 'high_protein' | 'vegetarian' | 'vegan' | 'keto' | 'paleo' | 'mediterranean' | 'dash' | 'custom';
+    workoutType: 'strength' | 'cardio' | 'flexibility' | 'mixed' | 'yoga' | 'pilates' | 'crossfit' | 'running' | 'cycling' | 'swimming';
+    workoutDuration: '15min' | '30min' | '45min' | '60min' | '75min' | '90min' | '120min';
     workoutDays: number;
     notifications: {
       meals: boolean;
@@ -301,7 +301,9 @@ export default function Profile() {
       muscle_gain: 'Ganho de Massa',
       maintenance: 'Manutenção',
       strength: 'Força',
-      endurance: 'Resistência'
+      endurance: 'Resistência',
+      flexibility: 'Flexibilidade',
+      general_fitness: 'Fitness Geral'
     };
     return labels[goal as keyof typeof labels] || goal;
   };
@@ -527,6 +529,8 @@ export default function Profile() {
                     <SelectItem value="maintenance">Manutenção</SelectItem>
                     <SelectItem value="strength">Força</SelectItem>
                     <SelectItem value="endurance">Resistência</SelectItem>
+                    <SelectItem value="flexibility">Flexibilidade</SelectItem>
+                    <SelectItem value="general_fitness">Fitness Geral</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -560,7 +564,7 @@ export default function Profile() {
               <div>
                 <Label className="text-sm font-medium mb-2 block">Metas Secundárias</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {['muscle_gain', 'endurance', 'flexibility', 'strength'].map((goal) => (
+                  {['muscle_gain', 'endurance', 'flexibility', 'strength', 'weight_loss', 'maintenance', 'general_fitness'].map((goal) => (
                     <Badge
                       key={goal}
                       variant={profile.fitnessGoals.secondary.includes(goal) ? 'default' : 'outline'}
@@ -608,6 +612,10 @@ export default function Profile() {
                     <SelectItem value="vegetarian">Vegetariana</SelectItem>
                     <SelectItem value="vegan">Vegana</SelectItem>
                     <SelectItem value="keto">Cetogênica</SelectItem>
+                    <SelectItem value="paleo">Paleo</SelectItem>
+                    <SelectItem value="mediterranean">Mediterrânea</SelectItem>
+                    <SelectItem value="dash">DASH</SelectItem>
+                    <SelectItem value="custom">Personalizada</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -627,6 +635,12 @@ export default function Profile() {
                     <SelectItem value="cardio">Cardio</SelectItem>
                     <SelectItem value="flexibility">Flexibilidade</SelectItem>
                     <SelectItem value="mixed">Misto</SelectItem>
+                    <SelectItem value="yoga">Yoga</SelectItem>
+                    <SelectItem value="pilates">Pilates</SelectItem>
+                    <SelectItem value="crossfit">CrossFit</SelectItem>
+                    <SelectItem value="running">Corrida</SelectItem>
+                    <SelectItem value="cycling">Ciclismo</SelectItem>
+                    <SelectItem value="swimming">Natação</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -643,10 +657,13 @@ export default function Profile() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="15min">15 minutos</SelectItem>
                       <SelectItem value="30min">30 minutos</SelectItem>
                       <SelectItem value="45min">45 minutos</SelectItem>
                       <SelectItem value="60min">1 hora</SelectItem>
+                      <SelectItem value="75min">1.25 horas</SelectItem>
                       <SelectItem value="90min">1.5 horas</SelectItem>
+                      <SelectItem value="120min">2 horas</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

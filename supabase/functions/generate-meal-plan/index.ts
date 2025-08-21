@@ -203,8 +203,10 @@ function calculateTDEE(bmr: number, activityLevel: string): number {
 function adjustCaloriesForGoal(tdee: number, goal: string): number {
   switch (goal) {
     case 'weight_loss':
+    case 'perda_peso':
       return Math.round(tdee * 0.85); // Déficit de 15%
     case 'muscle_gain':
+    case 'ganho_massa':
       return Math.round(tdee * 1.1);  // Superávit de 10%
     default:
       return Math.round(tdee);         // Manutenção
@@ -307,11 +309,48 @@ function generateDietRecommendations(dietType: string, goal: string) {
       "Inclua carboidratos complexos",
       "Mantenha um superávit calórico moderado",
       "Distribua as refeições ao longo do dia"
+    ],
+    balanced: [
+      "Mantenha um equilíbrio entre macronutrientes",
+      "Inclua variedade de frutas e vegetais",
+      "Prefira grãos integrais",
+      "Modere o consumo de gorduras saturadas"
+    ],
+    low_carb: [
+      "Foque em proteínas e gorduras saudáveis",
+      "Evite carboidratos refinados",
+      "Inclua vegetais de baixo carboidrato",
+      "Monitore seus níveis de cetose"
+    ],
+    vegetarian: [
+      "Combine proteínas vegetais para aminoácidos completos",
+      "Inclua fontes de vitamina B12",
+      "Consuma ferro com vitamina C para melhor absorção",
+      "Considere suplementação de ômega-3"
+    ],
+    vegan: [
+      "Planeje cuidadosamente para obter todos os nutrientes",
+      "Inclua fontes de proteína vegetal",
+      "Suplemente vitamina B12 e D",
+      "Monitore níveis de ferro e cálcio"
+    ],
+    keto: [
+      "Mantenha carboidratos abaixo de 50g por dia",
+      "Foque em gorduras saudáveis",
+      "Inclua eletrólitos para evitar cetoflu",
+      "Monitore níveis de cetose"
     ]
   };
 
-  return [
-    ...recommendations.general,
-    ...(recommendations[goal] || recommendations.general)
-  ];
+  let selectedRecommendations = [...recommendations.general];
+  
+  if (dietType && recommendations[dietType]) {
+    selectedRecommendations.push(...recommendations[dietType]);
+  }
+  
+  if (goal && recommendations[goal]) {
+    selectedRecommendations.push(...recommendations[goal]);
+  }
+  
+  return selectedRecommendations;
 }
