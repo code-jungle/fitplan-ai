@@ -177,8 +177,8 @@ export default function Auth() {
     
     if (isLogin) {
       // Handle login
-      setLoading(true);
-      try {
+    setLoading(true);
+    try {
         const { error } = await signIn(formData.email, formData.password);
         if (!error) {
           navigate('/dashboard');
@@ -187,8 +187,8 @@ export default function Auth() {
         console.error('Authentication error:', error);
       } finally {
         setLoading(false);
-      }
-    } else {
+        }
+      } else {
       // Handle signup completion
       setLoading(true);
       try {
@@ -197,7 +197,17 @@ export default function Auth() {
           // Salvar perfil completo no banco de dados
           const profileSaved = await saveUserProfile(user?.id || '');
           if (profileSaved) {
-            navigate('/dashboard');
+            // Mostrar mensagem de sucesso com instruções de verificação
+            toast({
+              title: "🎉 Conta criada com sucesso!",
+              description: "Verifique seu email para confirmar sua conta antes de acessar a aplicação.",
+              duration: 8000,
+            });
+            
+            // Aguardar um pouco para o usuário ler a mensagem
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 3000);
           } else {
             // Se não conseguir salvar o perfil, ainda permite navegar mas mostra aviso
             toast({
@@ -207,16 +217,16 @@ export default function Auth() {
             });
             navigate('/dashboard');
           }
-        }
-      } catch (error: any) {
+      }
+    } catch (error: any) {
         console.error('Signup error:', error);
         toast({
           title: "Erro ao criar conta",
           description: "Tente novamente ou entre em contato com o suporte.",
           variant: "destructive"
         });
-      } finally {
-        setLoading(false);
+    } finally {
+      setLoading(false);
       }
     }
   };
@@ -1010,7 +1020,7 @@ export default function Auth() {
           </div>
 
           {/* Progress Steps */}
-          {!isLogin && (
+            {!isLogin && (
             <div className="mb-6 sm:mb-8">
               {/* Mobile Progress Steps */}
               <div className="block sm:hidden mb-4">
@@ -1082,44 +1092,44 @@ export default function Auth() {
                     Passo {currentStep} de {STEPS.length}: {STEPS[currentStep - 1].title}
                   </p>
                 </div>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {!isLogin ? renderStepContent() : (
               <>
-                <div className="space-y-2">
+            <div className="space-y-2">
                   <Label htmlFor="email" className="text-foreground text-sm sm:text-base">E-mail</Label>
-                  <div className="relative">
+              <div className="relative">
                     <Mail className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-                    <Input 
-                      id="email"
-                      type="email"
-                      placeholder="seu@email.com"
+                <Input 
+                  id="email"
+                  type="email"
+                  placeholder="seu@email.com"
                       className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  required
+                />
+              </div>
+            </div>
 
-                <div className="space-y-2">
+            <div className="space-y-2">
                   <Label htmlFor="password" className="text-foreground text-sm sm:text-base">Senha</Label>
-                  <div className="relative">
+              <div className="relative">
                     <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-                    <Input 
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
+                <Input 
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
                       className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
-                      value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  required
+                />
+              </div>
+            </div>
               </>
             )}
 
@@ -1205,8 +1215,8 @@ export default function Auth() {
             <p className="text-sm sm:text-base text-muted-foreground">
               ✨ <span className="text-success font-semibold">7 dias grátis</span> para testar todos os recursos
             </p>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              A IA criará planos personalizados baseados nas suas informações
+            <p className="text-xs sm:text-sm text-muted-foreground mt-2">
+              📧 Após o cadastro, verifique seu email para confirmar sua conta
             </p>
           </div>
         )}

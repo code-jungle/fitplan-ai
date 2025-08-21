@@ -82,8 +82,10 @@ export default function Profile() {
   const { toast } = useToast();
 
   useEffect(() => {
-    loadUserProfile();
-  }, []);
+    if (user?.id) {
+      loadUserProfile();
+    }
+  }, [user?.id]);
 
   const loadUserProfile = async () => {
     if (!user?.id) return;
@@ -129,11 +131,11 @@ export default function Profile() {
         personalInfo: {
           name: profileData?.full_name || user?.user_metadata?.full_name || 'Usuário',
           email: user?.email || '',
-          age: profileData?.age || 25,
+          age: profileData?.age || 0,
           gender: profileData?.gender === 'masculino' ? 'male' : 
                   profileData?.gender === 'feminino' ? 'female' : 'other',
-          height: profileData?.height || 170,
-          weight: profileData?.weight || 70,
+          height: profileData?.height || 0,
+          weight: profileData?.weight || 0,
           activityLevel: profileData?.activity_level === 'sedentario' ? 'sedentary' :
                         profileData?.activity_level === 'leve' ? 'light' :
                         profileData?.activity_level === 'moderado' ? 'moderate' :
@@ -142,14 +144,14 @@ export default function Profile() {
         fitnessGoals: {
           primary: profileData?.goals?.[0] || 'general_fitness',
           secondary: profileData?.goals?.slice(1) || [],
-          targetWeight: profileData?.weight || 70,
+          targetWeight: profileData?.weight || 0,
           targetDate: new Date().toISOString().split('T')[0]
         },
         preferences: {
           dietType: dietData?.diet_type || 'balanced',
           workoutType: workoutData?.workout_type || 'mixed',
           workoutDuration: workoutData?.workout_duration || '60min',
-          workoutDays: workoutData?.workout_days || 3,
+          workoutDays: workoutData?.workout_days || 0,
           notifications: {
             meals: notificationData?.meals ?? true,
             workouts: notificationData?.workouts ?? true,
@@ -422,9 +424,10 @@ export default function Profile() {
                   <Input
                     id="age"
                     type="number"
-                    value={profile.personalInfo.age}
-                    onChange={(e) => updateProfile('personalInfo', 'age', parseInt(e.target.value))}
+                    value={profile.personalInfo.age || ''}
+                    onChange={(e) => updateProfile('personalInfo', 'age', parseInt(e.target.value) || 0)}
                     disabled={!isEditing}
+                    placeholder="Digite sua idade"
                     className="bg-input/50 border-border/50 h-10 text-sm"
                   />
                 </div>
@@ -436,9 +439,10 @@ export default function Profile() {
                   <Input
                     id="height"
                     type="number"
-                    value={profile.personalInfo.height}
-                    onChange={(e) => updateProfile('personalInfo', 'height', parseInt(e.target.value))}
+                    value={profile.personalInfo.height || ''}
+                    onChange={(e) => updateProfile('personalInfo', 'height', parseInt(e.target.value) || 0)}
                     disabled={!isEditing}
+                    placeholder="Digite sua altura"
                     className="bg-input/50 border-border/50 h-10 text-sm"
                   />
                 </div>
@@ -448,9 +452,10 @@ export default function Profile() {
                     id="weight"
                     type="number"
                     step="0.1"
-                    value={profile.personalInfo.weight}
-                    onChange={(e) => updateProfile('personalInfo', 'weight', parseFloat(e.target.value))}
+                    value={profile.personalInfo.weight || ''}
+                    onChange={(e) => updateProfile('personalInfo', 'weight', parseFloat(e.target.value) || 0)}
                     disabled={!isEditing}
+                    placeholder="Digite seu peso"
                     className="bg-input/50 border-border/50 h-10 text-sm"
                   />
                 </div>
@@ -534,7 +539,7 @@ export default function Profile() {
                   type="number"
                   step="0.1"
                   value={profile.fitnessGoals.targetWeight || ''}
-                  onChange={(e) => updateProfile('fitnessGoals', 'targetWeight', parseFloat(e.target.value))}
+                  onChange={(e) => updateProfile('fitnessGoals', 'targetWeight', parseFloat(e.target.value) || 0)}
                   disabled={!isEditing}
                     className="bg-input/50 border-border/50 h-10 text-sm"
                 />

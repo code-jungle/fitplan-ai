@@ -24,14 +24,14 @@ interface ProgressData {
   currentWeight: number;
   goalWeight: number;
   startWeight: number;
-  weeklyProgress: Array<{ week: string; weight: number }>;
-  measurements: {
+  weeklyProgress: Array<{ week: string; weight: number; date: string | null }>;
+  measurements: Partial<{
     chest: number;
     waist: number;
     hip: number;
     arm: number;
     thigh: number;
-  };
+  }>;
   weeklyStats: {
     workoutsCompleted: number;
     workoutsGoal: number;
@@ -53,7 +53,7 @@ export default function ProgressPage() {
     if (user?.id) {
       loadProgressData();
     }
-  }, [user]);
+  }, [user?.id]);
 
   const loadProgressData = async () => {
     if (!user?.id) return;
@@ -66,8 +66,7 @@ export default function ProgressPage() {
         .from('progress_tracking')
         .select('*')
         .eq('user_id', user.id)
-        .order('record_date', { ascending: false })
-        .limit(10);
+        .order('record_date', { ascending: false });
 
       if (progressError) {
         console.error('Erro ao carregar progresso:', progressError);
@@ -85,51 +84,65 @@ export default function ProgressPage() {
         console.error('Erro ao carregar perfil:', profileError);
       }
 
-      // Processar dados de progresso
-      const currentWeight = progressRecords?.[0]?.weight || profileData?.weight || 70;
-      const startWeight = progressRecords?.[progressRecords.length - 1]?.weight || profileData?.weight || 70;
-      const goalWeight = profileData?.weight ? profileData.weight * 0.9 : startWeight * 0.9; // Meta de 10% de perda
+      if (progressRecords && progressRecords.length > 0) {
+        const currentWeight = progressRecords[0].weight || 0;
+        const startWeight = profileData?.weight || currentWeight;
+        const goalWeight = startWeight * 0.9; // Meta de 10% de redução
 
-      // Criar progresso semanal
-      const weeklyProgress = progressRecords?.slice(0, 6).map((record, index) => ({
-        week: `Sem ${index + 1}`,
-        weight: record.weight || startWeight
-      })) || [
-        { week: "Sem 1", weight: startWeight },
-        { week: "Sem 2", weight: startWeight * 0.99 },
-        { week: "Sem 3", weight: startWeight * 0.98 },
-        { week: "Sem 4", weight: startWeight * 0.97 },
-        { week: "Sem 5", weight: startWeight * 0.96 },
-        { week: "Sem 6", weight: currentWeight }
-      ];
+        // Criar progresso semanal baseado em dados reais
+        const weeklyProgress = progressRecords.slice(0, 6).map((record, index) => ({
+          week: `Sem ${index + 1}`,
+          weight: record.weight,
+          date: record.record_date
+        }));
 
-      // Dados de medições (mockados por enquanto, mas podem ser salvos no banco)
-      const measurements = {
-        chest: 95,
-        waist: 85,
-        hip: 98,
-        arm: 35,
-        thigh: 58
-      };
+        // Preencher semanas restantes se necessário
+        while (weeklyProgress.length < 6) {
+          weeklyProgress.push({
+            week: `Sem ${weeklyProgress.length + 1}`,
+            weight: startWeight,
+            date: null
+          });
+        }
 
-      // Estatísticas semanais (mockadas por enquanto)
-      const weeklyStats = {
-        workoutsCompleted: 4,
-        workoutsGoal: 5,
-        caloriesAvg: 1850,
-        caloriesGoal: 1800,
-        waterAvg: 2.1,
-        waterGoal: 2.5
-      };
-
-      setProgressData({
-        currentWeight,
-        goalWeight,
-        startWeight,
-        weeklyProgress,
-        measurements,
-        weeklyStats
-      });
+        setProgressData({
+          currentWeight,
+          goalWeight,
+          startWeight,
+          weeklyProgress,
+          measurements: {}, // Será implementado quando houver tabela de medições
+          weeklyStats: {
+            workoutsCompleted: 0, // Será implementado quando houver tabela de treinos
+            workoutsGoal: 5,
+            caloriesAvg: 0, // Será implementado quando houver tabela de calorias
+            caloriesGoal: 1800,
+            waterAvg: 0, // Será implementado quando houver tabela de água
+            waterGoal: 2.5
+          }
+        });
+      } else {
+        // Usuário sem dados de progresso
+        const startWeight = profileData?.weight || 70;
+        setProgressData({
+          currentWeight: startWeight,
+          goalWeight: startWeight * 0.9,
+          startWeight,
+          weeklyProgress: Array.from({ length: 6 }, (_, i) => ({
+            week: `Sem ${i + 1}`,
+            weight: startWeight,
+            date: null
+          })),
+          measurements: {},
+          weeklyStats: {
+            workoutsCompleted: 0,
+            workoutsGoal: 5,
+            caloriesAvg: 0,
+            caloriesGoal: 1800,
+            waterAvg: 0,
+            waterGoal: 2.5
+          }
+        });
+      }
     } catch (error) {
       console.error('Erro ao carregar dados de progresso:', error);
     } finally {
@@ -172,7 +185,7 @@ export default function ProgressPage() {
         currentWeight: weight,
         weeklyProgress: [
           ...prev.weeklyProgress.slice(1),
-          { week: `Sem ${prev.weeklyProgress.length + 1}`, weight }
+          { week: `Sem ${prev.weeklyProgress.length + 1}`, weight, date: new Date().toISOString().split('T')[0] }
         ]
       } : null);
 
@@ -374,13 +387,21 @@ export default function ProgressPage() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {Object.entries(progressData.measurements).map(([part, measurement]) => (
-                  <div key={part} className="flex justify-between">
-                    <span className="text-muted-foreground capitalize">{part}</span>
-                    <span className="font-semibold text-foreground">{measurement}cm</span>
+                {Object.keys(progressData.measurements).length > 0 ? (
+                  Object.entries(progressData.measurements).map(([part, measurement]) => (
+                    <div key={part} className="flex justify-between">
+                      <span className="text-muted-foreground capitalize">{part}</span>
+                      <span className="font-semibold text-foreground">{measurement}cm</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4">
+                    <Ruler className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Nenhuma medida registrada</p>
+                    <p className="text-xs text-muted-foreground">Funcionalidade em desenvolvimento</p>
                   </div>
-                ))}
-                <CustomButton variant="outline" size="sm" className="w-full mt-4">
+                )}
+                <CustomButton variant="outline" size="sm" className="w-full mt-4" disabled>
                   <Plus className="w-4 h-4 mr-2" />
                   Atualizar medidas
                 </CustomButton>
