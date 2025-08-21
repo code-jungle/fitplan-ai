@@ -34,6 +34,7 @@ interface SignUpData {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   
   // Step 2: Personal Info
   age: number;
@@ -89,6 +90,7 @@ export default function Auth() {
     name: '',
     email: '',
     password: '',
+    confirmPassword: '',
     age: 25,
     gender: 'male',
     height: 170,
@@ -116,7 +118,6 @@ export default function Auth() {
     }
   });
   const [loading, setLoading] = useState(false);
-  const [tempInput, setTempInput] = useState('');
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -184,7 +185,6 @@ export default function Auth() {
         ...prev,
         [field]: [...prev[field as keyof SignUpData] as string[], value.trim()]
       }));
-      setTempInput('');
     }
   };
 
@@ -249,6 +249,21 @@ export default function Auth() {
                   className="pl-10 bg-input/50 border-border/50"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="text-foreground">Confirmar Senha</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Input 
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  className="pl-10 bg-input/50 border-border/50"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                   required
                 />
               </div>
@@ -535,14 +550,29 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Amendoim, Glúten..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={tempInput}
-                  onChange={(e) => setTempInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleArrayInput('allergies', tempInput)}
+                  value={formData.allergies.length > 0 ? '' : ''}
+                  onChange={(e) => {
+                    if (e.target.value.trim()) {
+                      handleArrayInput('allergies', e.target.value);
+                    }
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                      handleArrayInput('allergies', e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
                 />
                 <CustomButton 
                   type="button"
                   size="sm"
-                  onClick={() => handleArrayInput('allergies', tempInput)}
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder*="Amendoim"]') as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      handleArrayInput('allergies', input.value);
+                      input.value = '';
+                    }
+                  }}
                 >
                   <Plus className="w-4 h-4" />
                 </CustomButton>
@@ -563,14 +593,29 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Lactose, Fructose..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={tempInput}
-                  onChange={(e) => setTempInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleArrayInput('intolerances', tempInput)}
+                  value={formData.intolerances.length > 0 ? '' : ''}
+                  onChange={(e) => {
+                    if (e.target.value.trim()) {
+                      handleArrayInput('intolerances', e.target.value);
+                    }
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                      handleArrayInput('intolerances', e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
                 />
                 <CustomButton 
                   type="button"
                   size="sm"
-                  onClick={() => handleArrayInput('intolerances', tempInput)}
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder*="Lactose"]') as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      handleArrayInput('intolerances', input.value);
+                      input.value = '';
+                    }
+                  }}
                 >
                   <Plus className="w-4 h-4" />
                 </CustomButton>
@@ -591,14 +636,29 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Antidepressivo, Betabloqueador..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={tempInput}
-                  onChange={(e) => setTempInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleArrayInput('medications', tempInput)}
+                  value={formData.medications.length > 0 ? '' : ''}
+                  onChange={(e) => {
+                    if (e.target.value.trim()) {
+                      handleArrayInput('medications', e.target.value);
+                    }
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                      handleArrayInput('medications', e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
                 />
                 <CustomButton 
                   type="button"
                   size="sm"
-                  onClick={() => handleArrayInput('medications', tempInput)}
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder*="Antidepressivo"]') as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      handleArrayInput('medications', input.value);
+                      input.value = '';
+                    }
+                  }}
                 >
                   <Plus className="w-4 h-4" />
                 </CustomButton>
@@ -619,14 +679,29 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Lesão no joelho, Hérnia..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={tempInput}
-                  onChange={(e) => setTempInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleArrayInput('injuries', tempInput)}
+                  value={formData.injuries.length > 0 ? '' : ''}
+                  onChange={(e) => {
+                    if (e.target.value.trim()) {
+                      handleArrayInput('injuries', e.target.value);
+                    }
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                      handleArrayInput('injuries', e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
                 />
                 <CustomButton 
                   type="button"
                   size="sm"
-                  onClick={() => handleArrayInput('injuries', tempInput)}
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder*="Lesão no joelho"]') as HTMLInputElement;
+                    if (input && input.value.trim()) {
+                      handleArrayInput('injuries', input.value);
+                      input.value = '';
+                    }
+                  }}
                 >
                   <Plus className="w-4 h-4" />
                 </CustomButton>
@@ -884,6 +959,7 @@ export default function Auth() {
                   name: '',
                   email: '',
                   password: '',
+                  confirmPassword: '',
                   age: 25,
                   gender: 'male',
                   height: 170,
