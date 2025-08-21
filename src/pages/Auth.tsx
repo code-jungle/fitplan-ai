@@ -119,6 +119,10 @@ export default function Auth() {
   });
   const [loading, setLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+  const [tempAllergies, setTempAllergies] = useState('');
+  const [tempIntolerances, setTempIntolerances] = useState('');
+  const [tempMedications, setTempMedications] = useState('');
+  const [tempInjuries, setTempInjuries] = useState('');
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -600,16 +604,12 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Amendoim, Glúten..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={formData.allergies.length > 0 ? '' : ''}
-                  onChange={(e) => {
-                    if (e.target.value.trim()) {
-                      handleArrayInput('allergies', e.target.value);
-                    }
-                  }}
+                  value={tempAllergies}
+                  onChange={(e) => setTempAllergies(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      handleArrayInput('allergies', e.currentTarget.value);
-                      e.currentTarget.value = '';
+                    if (e.key === 'Enter' && tempAllergies.trim()) {
+                      handleArrayInput('allergies', tempAllergies);
+                      setTempAllergies('');
                     }
                   }}
                 />
@@ -617,10 +617,9 @@ export default function Auth() {
                   type="button"
                   size="sm"
                   onClick={() => {
-                    const input = document.querySelector('input[placeholder*="Amendoim"]') as HTMLInputElement;
-                    if (input && input.value.trim()) {
-                      handleArrayInput('allergies', input.value);
-                      input.value = '';
+                    if (tempAllergies.trim()) {
+                      handleArrayInput('allergies', tempAllergies);
+                      setTempAllergies('');
                     }
                   }}
                 >
@@ -643,16 +642,12 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Lactose, Fructose..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={formData.intolerances.length > 0 ? '' : ''}
-                  onChange={(e) => {
-                    if (e.target.value.trim()) {
-                      handleArrayInput('intolerances', e.target.value);
-                    }
-                  }}
+                  value={tempIntolerances}
+                  onChange={(e) => setTempIntolerances(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      handleArrayInput('intolerances', e.currentTarget.value);
-                      e.currentTarget.value = '';
+                    if (e.key === 'Enter' && tempIntolerances.trim()) {
+                      handleArrayInput('intolerances', tempIntolerances);
+                      setTempIntolerances('');
                     }
                   }}
                 />
@@ -660,10 +655,9 @@ export default function Auth() {
                   type="button"
                   size="sm"
                   onClick={() => {
-                    const input = document.querySelector('input[placeholder*="Lactose"]') as HTMLInputElement;
-                    if (input && input.value.trim()) {
-                      handleArrayInput('intolerances', input.value);
-                      input.value = '';
+                    if (tempIntolerances.trim()) {
+                      handleArrayInput('intolerances', tempIntolerances);
+                      setTempIntolerances('');
                     }
                   }}
                 >
@@ -686,16 +680,12 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Antidepressivo, Betabloqueador..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={formData.medications.length > 0 ? '' : ''}
-                  onChange={(e) => {
-                    if (e.target.value.trim()) {
-                      handleArrayInput('medications', e.target.value);
-                    }
-                  }}
+                  value={tempMedications}
+                  onChange={(e) => setTempMedications(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      handleArrayInput('medications', e.currentTarget.value);
-                      e.currentTarget.value = '';
+                    if (e.key === 'Enter' && tempMedications.trim()) {
+                      handleArrayInput('medications', tempMedications);
+                      setTempMedications('');
                     }
                   }}
                 />
@@ -703,10 +693,9 @@ export default function Auth() {
                   type="button"
                   size="sm"
                   onClick={() => {
-                    const input = document.querySelector('input[placeholder*="Antidepressivo"]') as HTMLInputElement;
-                    if (input && input.value.trim()) {
-                      handleArrayInput('medications', input.value);
-                      input.value = '';
+                    if (tempMedications.trim()) {
+                      handleArrayInput('medications', tempMedications);
+                      setTempMedications('');
                     }
                   }}
                 >
@@ -729,16 +718,12 @@ export default function Auth() {
                 <Input 
                   placeholder="Ex: Lesão no joelho, Hérnia..."
                   className="flex-1 bg-input/50 border-border/50"
-                  value={formData.injuries.length > 0 ? '' : ''}
-                  onChange={(e) => {
-                    if (e.target.value.trim()) {
-                      handleArrayInput('injuries', e.target.value);
-                    }
-                  }}
+                  value={tempInjuries}
+                  onChange={(e) => setTempInjuries(e.target.value)}
                   onKeyPress={(e) => {
-                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                      handleArrayInput('injuries', e.currentTarget.value);
-                      e.currentTarget.value = '';
+                    if (e.key === 'Enter' && tempInjuries.trim()) {
+                      handleArrayInput('injuries', tempInjuries);
+                      setTempInjuries('');
                     }
                   }}
                 />
@@ -746,10 +731,9 @@ export default function Auth() {
                   type="button"
                   size="sm"
                   onClick={() => {
-                    const input = document.querySelector('input[placeholder*="Lesão no joelho"]') as HTMLInputElement;
-                    if (input && input.value.trim()) {
-                      handleArrayInput('injuries', input.value);
-                      input.value = '';
+                    if (tempInjuries.trim()) {
+                      handleArrayInput('injuries', tempInjuries);
+                      setTempInjuries('');
                     }
                   }}
                 >
