@@ -53,7 +53,7 @@ export function Pricing() {
               ))}
             </div>
 
-            <Link to="/auth">
+            <Link to="/auth?mode=signup" className="block">
               <CustomButton size="lg" className="w-full mb-4">
                 Começar teste gratuito
               </CustomButton>
