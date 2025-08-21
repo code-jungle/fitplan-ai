@@ -1,14 +1,27 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+// Security: Restrict CORS to specific origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:8080', // Keep for backward compatibility
+  'https://yourdomain.com' // Replace with your actual domain
+];
+
+const corsHeaders = (origin: string) => ({
+  'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : '',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Max-Age': '86400',
+});
 
 serve(async (req) => {
+  // Security: Get origin and validate CORS
+  const origin = req.headers.get('Origin') || '';
+  const headers = corsHeaders(origin);
+  
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -18,16 +31,72 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const authHeader = req.headers.get('Authorization')!;
+    // Security: Validate Authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ 
+        error: 'Token de autorização inválido ou ausente' 
+      }), {
+        status: 401,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+    
     const token = authHeader.replace('Bearer ', '');
+    if (!token) {
+      return new Response(JSON.stringify({ 
+        error: 'Token de autorização vazio' 
+      }), {
+        status: 401,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+    
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     
     if (userError || !userData.user) {
-      throw new Error('Usuário não autenticado');
+      return new Response(JSON.stringify({ 
+        error: 'Usuário não autenticado' 
+      }), {
+        status: 401,
+        headers: { ...headers, 'ContentType': 'application/json' }
+      });
     }
 
     const user = userData.user;
-    const { targetDate, workoutType } = await req.json();
+    // Security: Validate request body
+    let requestBody;
+    try {
+      requestBody = await req.json();
+    } catch (error) {
+      return new Response(JSON.stringify({ 
+        error: 'Corpo da requisição inválido' 
+      }), {
+        status: 400,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    const { targetDate, workoutType } = requestBody;
+    
+    // Security: Validate input parameters
+    if (targetDate && typeof targetDate !== 'string') {
+      return new Response(JSON.stringify({ 
+        error: 'Data de destino deve ser uma string válida' 
+      }), {
+        status: 400,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    if (workoutType && typeof workoutType !== 'string') {
+      return new Response(JSON.stringify({ 
+        error: 'Tipo de treino deve ser uma string válida' 
+      }), {
+        status: 400,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
 
     // Buscar perfil do usuário
     const { data: profile } = await supabaseClient
@@ -49,12 +118,12 @@ serve(async (req) => {
     );
 
     if (!hasAccess) {
-      return new Response(JSON.stringify({ 
-        error: 'Acesso negado. Assinatura necessária.' 
-      }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+          return new Response(JSON.stringify({ 
+      error: 'Acesso negado. Assinatura necessária.' 
+    }), {
+      status: 403,
+      headers: { ...headers, 'Content-Type': 'application/json' }
+    });
     }
 
     // Determinar nível de dificuldade baseado no activity_level
@@ -149,16 +218,16 @@ Crie um treino adequado para academia ou casa, com exercícios seguros e progres
       });
 
     return new Response(JSON.stringify(workoutPlan), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: { ...headers, 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
     console.error('Erro ao gerar treino:', error);
     return new Response(JSON.stringify({ 
-      error: error.message || 'Erro interno do servidor' 
+      error: 'Erro interno do servidor' // Don't expose internal error details
     }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+      headers: { ...headers, 'Content-Type': 'application/json' }
+      });
   }
 });

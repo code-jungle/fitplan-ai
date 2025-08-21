@@ -105,6 +105,11 @@ CREATE POLICY "Edge functions can manage subscriptions"
 ON public.subscribers FOR ALL 
 USING (true);
 
+-- Allow the initialize_free_trial function to insert into subscribers
+CREATE POLICY "Allow trial initialization" 
+ON public.subscribers FOR INSERT 
+WITH CHECK (true);
+
 -- Create RLS policies for meal_plans
 CREATE POLICY "Users can view their own meal plans" 
 ON public.meal_plans FOR SELECT 

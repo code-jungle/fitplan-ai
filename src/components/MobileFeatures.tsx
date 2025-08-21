@@ -29,7 +29,7 @@ export function MobileFeatures() {
       <div className="max-w-md mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-orbitron font-bold text-gradient mb-4">
-            Tecnologia Avançada
+            Tecnologia avançada
           </h2>
           <p className="text-muted-foreground">
             Descubra como nossa IA revoluciona sua jornada fitness

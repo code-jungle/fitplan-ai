@@ -35,10 +35,12 @@ export default function Dashboard() {
         <div className="container mx-auto flex items-center justify-between">
           <Logo />
           <div className="flex items-center gap-4">
-            <CustomButton variant="glass" size="sm">
-              <User className="w-4 h-4" />
-              Perfil
-            </CustomButton>
+            <Link to="/profile">
+              <CustomButton variant="glass" size="sm">
+                <User className="w-4 h-4" />
+                Perfil
+              </CustomButton>
+            </Link>
             <Link to="/subscription">
               <CustomButton variant="outline" size="sm">
                 Assinatura

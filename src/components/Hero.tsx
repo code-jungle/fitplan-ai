@@ -10,11 +10,21 @@ export function Hero() {
       <header className="relative z-20 p-6">
         <div className="flex items-center justify-between">
           <Logo size="md" />
-          <button className="text-foreground">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-4">
+            <Link 
+              to="/auth" 
+              className="px-4 py-2 text-foreground hover:text-primary border border-border/30 hover:border-primary/50 rounded-lg transition-all duration-300 hover:bg-primary/10"
+            >
+              Entrar
+            </Link>
+            <Link 
+              to="/auth?mode=signup" 
+              className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Começar Agora
+            </Link>
+            
+          </div>
         </div>
       </header>
 
@@ -43,7 +53,7 @@ export function Hero() {
 
           {/* CTA Buttons */}
           <div className="space-y-4 mb-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <Link to="/auth" className="block">
+            <Link to="/auth?mode=signup" className="block">
               <CustomButton size="lg" className="w-full text-lg py-6 animate-glow">
                 <Lock className="w-5 h-5 mr-2" />
                 Experimente Grátis por 7 Dias

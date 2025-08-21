@@ -62,7 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('Attempting signup with:', { email, fullName });
+      
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
+        console.error('Supabase signup error:', error);
         toast({
           title: "Erro no cadastro",
           description: error.message,
@@ -82,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error };
       }
 
+      console.log('Signup successful:', data);
       toast({
         title: "Cadastro realizado!",
         description: "Verifique seu e-mail para confirmar a conta.",
@@ -89,6 +93,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       return { error: null };
     } catch (error: any) {
+      console.error('Unexpected signup error:', error);
+      toast({
+        title: "Erro inesperado",
+        description: "Ocorreu um erro durante o cadastro. Tente novamente.",
+        variant: "destructive",
+      });
       return { error };
     }
   };

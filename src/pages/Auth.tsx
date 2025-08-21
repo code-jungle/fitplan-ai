@@ -3,10 +3,12 @@ import { Logo } from "@/components/Logo";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mail, Lock, User, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+// Temporarily comment out validation to test if it's causing the issue
+// import { validateEmail, validatePassword, sanitizeString } from "@/lib/validation";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -18,7 +20,16 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, signIn, signUp } = useAuth();
+
+  // Check URL parameters to determine initial mode
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    if (mode === 'signup') {
+      setIsLogin(false);
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   if (user) {
@@ -31,6 +42,7 @@ export default function Auth() {
     setLoading(true);
 
     try {
+      // Temporarily simplified for testing
       if (isLogin) {
         const { error } = await signIn(formData.email, formData.password);
         if (!error) {
@@ -42,7 +54,7 @@ export default function Auth() {
           setIsLogin(true);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Authentication error:', error);
     } finally {
       setLoading(false);

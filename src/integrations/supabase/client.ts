@@ -2,15 +2,26 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://mwwegzxljanphfwryrql.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13d2VnenhsamFucGhmd3J5cnFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMTI1NzYsImV4cCI6MjA3MDg4ODU3Nn0.ewtlVGoV-eRtCF0p5JTKvHaEhHW12soHb4M3Y6NwOps";
+// Use environment variables with fallback for development
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://mwwegzxljanphfwryrql.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13d2VnenhsamFucGhmd3J5cnFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMTI1NzYsImV4cCI6MjA3MDg4ODU3Nn0.ewtlVGoV-eRtCF0p5JTKvHaEhHW12soHb4M3Y6NwOps";
+
+// Log configuration for debugging
+if (import.meta.env.DEV) {
+  console.log('Supabase Configuration:', {
+    url: SUPABASE_URL,
+    hasKey: !!SUPABASE_PUBLISHABLE_KEY,
+    envUrl: import.meta.env.VITE_SUPABASE_URL,
+    envKey: import.meta.env.VITE_SUPABASE_ANON_KEY
+  });
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: typeof window !== 'undefined' ? localStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
   }

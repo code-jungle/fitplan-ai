@@ -1,73 +1,257 @@
-# Welcome to your Lovable project
+# 🚀 FitPlanAI - Assistente Fitness Inteligente
 
-## Project info
+**FitPlanAI** é uma aplicação PWA (Progressive Web App) que funciona como seu assistente pessoal de saúde e fitness com **IA adaptativa usando o modelo Gemini**.
 
-**URL**: https://lovable.dev/projects/14d7d7f2-8f6b-475c-8276-d1a2530f26dc
+## ✨ **Funcionalidades Principais**
 
-## How can I edit this code?
+### 🧠 **IA Adaptativa com Gemini**
+- **Planos personalizados** de dieta e treino gerados por IA
+- **Ajustes automáticos diários** baseados no progresso
+- **Insights inteligentes** e recomendações personalizadas
+- **Aprendizado contínuo** com base nos hábitos do usuário
 
-There are several ways of editing your application.
+### 📱 **PWA (Progressive Web App)**
+- ✅ **Instalável** como aplicativo nativo
+- ✅ **Funciona offline** com cache inteligente
+- ✅ **Notificações push** para lembretes
+- ✅ **Responsivo** para todos os dispositivos
+- ✅ **Sincronização** automática de dados
 
-**Use Lovable**
+### 💳 **Sistema de Assinatura**
+- **7 dias de teste gratuito** sem compromisso
+- **Assinatura mensal** de R$ 14,90 via Stripe
+- **Cancelamento** a qualquer momento
+- **Controle completo** da assinatura
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/14d7d7f2-8f6b-475c-8276-d1a2530f26dc) and start prompting.
+### 🎯 **Dashboard Completo**
+- **Visão geral** com estatísticas em tempo real
+- **Planos alimentares** personalizados com IA
+- **Planos de treino** adaptativos
+- **Acompanhamento de progresso** detalhado
+- **Gráficos** e métricas de evolução
 
-Changes made via Lovable will be committed automatically to this repo.
+### 👤 **Perfil do Usuário**
+- **Informações pessoais** completas
+- **Metas de fitness** personalizáveis
+- **Preferências** de dieta e treino
+- **Restrições** e limitações médicas
+- **Configurações** de notificações
 
-**Use your preferred IDE**
+### 🔒 **Segurança e Privacidade**
+- **Autenticação** segura com Supabase
+- **Criptografia** de dados sensíveis
+- **Validação** robusta de inputs
+- **Headers de segurança** implementados
+- **Rate limiting** para proteção
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🛠️ **Tecnologias Utilizadas**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### **Frontend**
+- **React 18** com TypeScript
+- **Vite** para build e desenvolvimento
+- **Tailwind CSS** para estilização
+- **Shadcn/ui** para componentes
+- **React Router** para navegação
 
-Follow these steps:
+### **Backend & IA**
+- **Supabase** para autenticação e banco
+- **Gemini AI** para geração de planos
+- **Stripe** para pagamentos
+- **Edge Functions** para APIs
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### **PWA & Performance**
+- **Service Worker** para cache offline
+- **Manifest** para instalação
+- **Notificações push** nativas
+- **Lazy loading** de componentes
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🚀 **Como Executar**
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### **1. Clone o repositório**
+```bash
+git clone https://github.com/seu-usuario/genius-fit-plan.git
+cd genius-fit-plan
 ```
 
-**Edit a file directly in GitHub**
+### **2. Instale as dependências**
+```bash
+npm install
+# ou
+yarn install
+# ou
+bun install
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### **3. Configure as variáveis de ambiente**
+Crie um arquivo `.env` baseado no `env.example`:
+```bash
+cp env.example .env
+```
 
-**Use GitHub Codespaces**
+Configure as seguintes variáveis:
+```env
+# Supabase
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Stripe
+VITE_STRIPE_PUBLISHABLE_KEY=sua_chave_publica_do_stripe
+VITE_STRIPE_PRICE_ID=seu_price_id_do_stripe
 
-## What technologies are used for this project?
+# Gemini AI
+VITE_GEMINI_API_KEY=sua_chave_api_do_gemini
+```
 
-This project is built with:
+### **4. Execute o projeto**
+```bash
+npm run dev
+# ou
+yarn dev
+# ou
+bun dev
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+A aplicação estará disponível em `http://localhost:3000`
 
-## How can I deploy this project?
+## 📱 **Como Instalar como PWA**
 
-Simply open [Lovable](https://lovable.dev/projects/14d7d7f2-8f6b-475c-8276-d1a2530f26dc) and click on Share -> Publish.
+1. **Acesse** a aplicação no navegador
+2. **Clique** no ícone de instalação na barra de endereços
+3. **Confirme** a instalação
+4. **Acesse** como um aplicativo nativo
 
-## Can I connect a custom domain to my Lovable project?
+## 🎨 **Design System**
 
-Yes, you can!
+### **Paleta de Cores**
+- **Primária**: Azul escuro (#6366f1)
+- **Secundária**: Roxo (#8b5cf6)
+- **Background**: Preto tech (#0a0a0f)
+- **Glassmorphism**: Translúcido com blur
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### **Tipografia**
+- **Fonte principal**: Orbitron (futurista)
+- **Hierarquia clara** e legível
+- **Responsiva** para todos os tamanhos
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### **Componentes**
+- **Cartões glassmorphism** translúcidos
+- **Botões** com gradientes e hover modernos
+- **Ícones** Lucide React
+- **Animações** suaves e elegantes
+
+## 🔧 **Estrutura do Projeto**
+
+```
+src/
+├── components/          # Componentes reutilizáveis
+│   ├── ui/             # Componentes de UI base
+│   ├── Hero.tsx        # Seção principal da landing
+│   ├── Logo.tsx        # Logo da aplicação
+│   └── ...
+├── pages/              # Páginas da aplicação
+│   ├── Index.tsx       # Landing page
+│   ├── Auth.tsx        # Login/Cadastro
+│   ├── Dashboard.tsx   # Dashboard principal
+│   ├── Profile.tsx     # Perfil do usuário
+│   ├── Progress.tsx    # Acompanhamento de progresso
+│   └── Subscription.tsx # Página de assinatura
+├── contexts/           # Contextos React
+│   └── AuthContext.tsx # Contexto de autenticação
+├── hooks/              # Hooks customizados
+│   ├── use-pwa.ts      # Hook para funcionalidades PWA
+│   └── use-toast.ts    # Hook para notificações
+├── lib/                # Utilitários e configurações
+│   ├── stripe.ts       # Integração com Stripe
+│   ├── validation.ts   # Validações e schemas
+│   ├── security.ts     # Configurações de segurança
+│   └── utils.ts        # Funções utilitárias
+├── types/              # Tipos TypeScript
+│   └── user.ts         # Tipos do usuário
+└── integrations/       # Integrações externas
+    └── supabase/       # Configuração do Supabase
+```
+
+## 🔐 **Funcionalidades de Segurança**
+
+### **Implementadas**
+- ✅ **Validação de inputs** com Zod
+- ✅ **Sanitização** de strings
+- ✅ **Rate limiting** básico
+- ✅ **Headers de segurança** (CORS, CSP)
+- ✅ **Validação JWT** nas APIs
+- ✅ **Criptografia** de dados sensíveis
+
+### **Recomendações para Produção**
+- 🔒 **HTTPS** obrigatório
+- 🔒 **Firewall** de aplicação
+- 🔒 **Monitoramento** de segurança
+- 🔒 **Backup** regular dos dados
+- 🔒 **Logs** de auditoria
+
+## 📊 **Funcionalidades da IA**
+
+### **Planos Alimentares**
+- **Análise nutricional** completa
+- **Preferências** do usuário
+- **Restrições** alimentares
+- **Objetivos** de peso e saúde
+- **Adaptação** baseada no progresso
+
+### **Planos de Treino**
+- **Nível** de condicionamento
+- **Objetivos** específicos
+- **Equipamento** disponível
+- **Tempo** disponível
+- **Progressão** gradual
+
+### **Insights Inteligentes**
+- **Análise** de tendências
+- **Recomendações** personalizadas
+- **Alertas** de saúde
+- **Motivação** baseada em dados
+- **Ajustes** automáticos
+
+## 🚀 **Roadmap Futuro**
+
+### **Versão 2.0**
+- 📱 **App nativo** iOS/Android
+- 🏃 **Integração com wearables**
+- 🥗 **Base de dados de alimentos**
+- 📊 **Gráficos avançados**
+- 🌍 **Múltiplos idiomas**
+
+### **Versão 3.0**
+- 🤖 **Chat com IA** em tempo real
+- 📸 **Reconhecimento de alimentos**
+- 🎯 **Desafios e gamificação**
+- 👥 **Comunidade e social**
+- 📈 **Machine Learning avançado**
+
+## 🤝 **Contribuindo**
+
+1. **Fork** o projeto
+2. **Crie** uma branch para sua feature
+3. **Commit** suas mudanças
+4. **Push** para a branch
+5. **Abra** um Pull Request
+
+## 📄 **Licença**
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## 📞 **Suporte**
+
+- **Email**: suporte@fitplanai.com
+- **Documentação**: [docs.fitplanai.com](https://docs.fitplanai.com)
+- **Issues**: [GitHub Issues](https://github.com/seu-usuario/genius-fit-plan/issues)
+
+## 🙏 **Agradecimentos**
+
+- **Google Gemini** pela IA
+- **Supabase** pela infraestrutura
+- **Stripe** pelos pagamentos
+- **Comunidade open source** pelo suporte
+
+---
+
+**Transforme sua saúde com IA adaptativa! 🚀💪**
