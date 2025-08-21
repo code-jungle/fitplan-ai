@@ -232,16 +232,16 @@ export default function Auth() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">Nome completo</Label>
+              <Label htmlFor="name" className="text-foreground text-sm sm:text-base">Nome completo</Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <User className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="name"
                   type="text"
                   placeholder="Seu nome completo"
-                  className="pl-10 bg-input/50 border-border/50"
+                  className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   required
@@ -250,14 +250,14 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">E-mail</Label>
+              <Label htmlFor="email" className="text-foreground text-sm sm:text-base">E-mail</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Mail className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="email"
                   type="email"
                   placeholder="seu@email.com"
-                  className="pl-10 bg-input/50 border-border/50"
+                  className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   required
@@ -266,14 +266,14 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Senha</Label>
+              <Label htmlFor="password" className="text-foreground text-sm sm:text-base">Senha</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  className={`pl-10 bg-input/50 border-border/50 ${
+                  className={`pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base ${
                     passwordError && formData.password !== formData.confirmPassword 
                       ? 'border-destructive' 
                       : ''
@@ -292,14 +292,14 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-foreground">Confirmar Senha</Label>
+              <Label htmlFor="confirmPassword" className="text-foreground text-sm sm:text-base">Confirmar Senha</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="confirmPassword"
                   type="password"
                   placeholder="••••••••"
-                  className={`pl-10 bg-input/50 border-border/50 ${
+                  className={`pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base ${
                     passwordError && formData.password !== formData.confirmPassword 
                       ? 'border-destructive' 
                       : ''
@@ -327,27 +327,27 @@ export default function Auth() {
 
       case 2:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-foreground">Idade</Label>
+                <Label htmlFor="age" className="text-foreground text-sm sm:text-base">Idade</Label>
                 <Input 
                   id="age"
                   type="number"
                   placeholder="25"
-                  className="bg-input/50 border-border/50"
+                  className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.age}
                   onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="gender" className="text-foreground">Gênero</Label>
+                <Label htmlFor="gender" className="text-foreground text-sm sm:text-base">Gênero</Label>
                 <Select
                   value={formData.gender}
                   onValueChange={(value) => handleInputChange('gender', value)}
                 >
-                  <SelectTrigger className="bg-input/50 border-border/50">
+                  <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -361,25 +361,25 @@ export default function Auth() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="height" className="text-foreground">Altura (cm)</Label>
+                <Label htmlFor="height" className="text-foreground text-sm sm:text-base">Altura (cm)</Label>
                 <Input 
                   id="height"
                   type="number"
                   placeholder="170"
-                  className="bg-input/50 border-border/50"
+                  className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.height}
                   onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="weight" className="text-foreground">Peso (kg)</Label>
+                <Label htmlFor="weight" className="text-foreground text-sm sm:text-base">Peso (kg)</Label>
                 <Input 
                   id="weight"
                   type="number"
                   step="0.1"
                   placeholder="70.0"
-                  className="bg-input/50 border-border/50"
+                  className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.weight}
                   onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
                   required
@@ -388,12 +388,12 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="activityLevel" className="text-foreground">Nível de Atividade</Label>
+              <Label htmlFor="activityLevel" className="text-foreground text-sm sm:text-base">Nível de Atividade</Label>
               <Select
                 value={formData.activityLevel}
                 onValueChange={(value) => handleInputChange('activityLevel', value)}
               >
-                <SelectTrigger className="bg-input/50 border-border/50">
+                <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -410,14 +410,14 @@ export default function Auth() {
 
       case 3:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="primaryGoal" className="text-foreground">Meta Principal</Label>
+              <Label htmlFor="primaryGoal" className="text-foreground text-sm sm:text-base">Meta Principal</Label>
               <Select
                 value={formData.primaryGoal}
                 onValueChange={(value) => handleInputChange('primaryGoal', value)}
               >
-                <SelectTrigger className="bg-input/50 border-border/50">
+                <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -434,23 +434,23 @@ export default function Auth() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="targetWeight" className="text-foreground">Peso Alvo (kg)</Label>
+                <Label htmlFor="targetWeight" className="text-foreground text-sm sm:text-base">Peso Alvo (kg)</Label>
                 <Input 
                   id="targetWeight"
                   type="number"
                   step="0.1"
                   placeholder="65.0"
-                  className="bg-input/50 border-border/50"
+                  className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.targetWeight || ''}
                   onChange={(e) => handleInputChange('targetWeight', parseFloat(e.target.value))}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="targetDate" className="text-foreground">Data Alvo</Label>
+                <Label htmlFor="targetDate" className="text-foreground text-sm sm:text-base">Data Alvo</Label>
                 <Input 
                   id="targetDate"
                   type="date"
-                  className="bg-input/50 border-border/50"
+                  className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.targetDate || ''}
                   onChange={(e) => handleInputChange('targetDate', e.target.value)}
                 />
@@ -458,13 +458,13 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-foreground">Metas Secundárias</Label>
+              <Label className="text-foreground text-sm sm:text-base">Metas Secundárias</Label>
               <div className="flex flex-wrap gap-2">
                 {['muscle_gain', 'endurance', 'flexibility', 'strength', 'cardio', 'balance'].map((goal) => (
                   <Badge
                     key={goal}
                     variant={formData.secondaryGoals.includes(goal) ? 'default' : 'outline'}
-                    className="cursor-pointer"
+                    className="cursor-pointer text-xs px-2 py-1"
                     onClick={() => {
                       const newGoals = formData.secondaryGoals.includes(goal)
                         ? formData.secondaryGoals.filter(g => g !== goal)
@@ -488,14 +488,14 @@ export default function Auth() {
 
       case 4:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="dietType" className="text-foreground">Tipo de Dieta</Label>
+              <Label htmlFor="dietType" className="text-foreground text-sm sm:text-base">Tipo de Dieta</Label>
               <Select
                 value={formData.dietType}
                 onValueChange={(value) => handleInputChange('dietType', value)}
               >
-                <SelectTrigger className="bg-input/50 border-border/50">
+                <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -515,14 +515,14 @@ export default function Auth() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="workoutType" className="text-foreground">Tipo de Treino</Label>
+                <Label htmlFor="workoutType" className="text-foreground text-sm sm:text-base">Tipo de Treino</Label>
                 <Select
                   value={formData.workoutType}
                   onValueChange={(value) => handleInputChange('workoutType', value)}
                 >
-                  <SelectTrigger className="bg-input/50 border-border/50">
+                  <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                     <SelectValue />
-                  </SelectTrigger>
+                </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="strength">Força</SelectItem>
                     <SelectItem value="cardio">Cardio</SelectItem>
@@ -538,12 +538,12 @@ export default function Auth() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="workoutDuration" className="text-foreground">Duração do Treino</Label>
+                <Label htmlFor="workoutDuration" className="text-foreground text-sm sm:text-base">Duração do Treino</Label>
                 <Select
                   value={formData.workoutDuration}
                   onValueChange={(value) => handleInputChange('workoutDuration', value)}
                 >
-                  <SelectTrigger className="bg-input/50 border-border/50">
+                  <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -561,26 +561,26 @@ export default function Auth() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="workoutDays" className="text-foreground">Dias de Treino por Semana</Label>
+                <Label htmlFor="workoutDays" className="text-foreground text-sm sm:text-base">Dias de Treino por Semana</Label>
                 <Input 
                   id="workoutDays"
                   type="number"
                   min="1"
                   max="7"
                   placeholder="3"
-                  className="bg-input/50 border-border/50"
+                  className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.workoutDays}
                   onChange={(e) => handleInputChange('workoutDays', parseInt(e.target.value))}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="preferredWorkoutTime" className="text-foreground">Horário Preferido</Label>
+                <Label htmlFor="preferredWorkoutTime" className="text-foreground text-sm sm:text-base">Horário Preferido</Label>
                 <Select
                   value={formData.preferredWorkoutTime}
                   onValueChange={(value) => handleInputChange('preferredWorkoutTime', value)}
                 >
-                  <SelectTrigger className="bg-input/50 border-border/50">
+                  <SelectTrigger className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -597,13 +597,13 @@ export default function Auth() {
 
       case 5:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="space-y-2">
-              <Label className="text-foreground">Alergias Alimentares</Label>
+              <Label className="text-foreground text-sm sm:text-base">Alergias Alimentares</Label>
               <div className="flex gap-2">
                 <Input 
                   placeholder="Ex: Amendoim, Glúten..."
-                  className="flex-1 bg-input/50 border-border/50"
+                  className="flex-1 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={tempAllergies}
                   onChange={(e) => setTempAllergies(e.target.value)}
                   onKeyPress={(e) => {
@@ -616,6 +616,7 @@ export default function Auth() {
                 <CustomButton 
                   type="button"
                   size="sm"
+                  className="h-10 sm:h-11 px-3 sm:px-4"
                   onClick={() => {
                     if (tempAllergies.trim()) {
                       handleArrayInput('allergies', tempAllergies);
@@ -623,12 +624,12 @@ export default function Auth() {
                     }
                   }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </CustomButton>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.allergies.map((allergy, index) => (
-                  <Badge key={index} variant="destructive" className="flex items-center gap-1">
+                  <Badge key={index} variant="destructive" className="flex items-center gap-1 text-xs px-2 py-1">
                     {allergy}
                     <X className="w-3 h-3 cursor-pointer" onClick={() => removeArrayItem('allergies', index)} />
                   </Badge>
@@ -637,11 +638,11 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-foreground">Intolerâncias</Label>
+              <Label className="text-foreground text-sm sm:text-base">Intolerâncias</Label>
               <div className="flex gap-2">
                 <Input 
                   placeholder="Ex: Lactose, Fructose..."
-                  className="flex-1 bg-input/50 border-border/50"
+                  className="flex-1 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={tempIntolerances}
                   onChange={(e) => setTempIntolerances(e.target.value)}
                   onKeyPress={(e) => {
@@ -654,6 +655,7 @@ export default function Auth() {
                 <CustomButton 
                   type="button"
                   size="sm"
+                  className="h-10 sm:h-11 px-3 sm:px-4"
                   onClick={() => {
                     if (tempIntolerances.trim()) {
                       handleArrayInput('intolerances', tempIntolerances);
@@ -661,12 +663,12 @@ export default function Auth() {
                     }
                   }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </CustomButton>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.intolerances.map((intolerance, index) => (
-                  <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  <Badge key={index} variant="secondary" className="flex items-center gap-1 text-xs px-2 py-1">
                     {intolerance}
                     <X className="w-3 h-3 cursor-pointer" onClick={() => removeArrayItem('intolerances', index)} />
                   </Badge>
@@ -675,11 +677,11 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-foreground">Medicamentos em Uso</Label>
+              <Label className="text-foreground text-sm sm:text-base">Medicamentos em Uso</Label>
               <div className="flex gap-2">
                 <Input 
                   placeholder="Ex: Antidepressivo, Betabloqueador..."
-                  className="flex-1 bg-input/50 border-border/50"
+                  className="flex-1 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={tempMedications}
                   onChange={(e) => setTempMedications(e.target.value)}
                   onKeyPress={(e) => {
@@ -692,6 +694,7 @@ export default function Auth() {
                 <CustomButton 
                   type="button"
                   size="sm"
+                  className="h-10 sm:h-11 px-3 sm:px-4"
                   onClick={() => {
                     if (tempMedications.trim()) {
                       handleArrayInput('medications', tempMedications);
@@ -699,12 +702,12 @@ export default function Auth() {
                     }
                   }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </CustomButton>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.medications.map((medication, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center gap-1">
+                  <Badge key={index} variant="outline" className="flex items-center gap-1 text-xs px-2 py-1">
                     {medication}
                     <X className="w-3 h-3 cursor-pointer" onClick={() => removeArrayItem('medications', index)} />
                   </Badge>
@@ -713,11 +716,11 @@ export default function Auth() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-foreground">Lesões/Problemas Físicos</Label>
+              <Label className="text-foreground text-sm sm:text-base">Lesões/Problemas Físicos</Label>
               <div className="flex gap-2">
                 <Input 
                   placeholder="Ex: Lesão no joelho, Hérnia..."
-                  className="flex-1 bg-input/50 border-border/50"
+                  className="flex-1 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={tempInjuries}
                   onChange={(e) => setTempInjuries(e.target.value)}
                   onKeyPress={(e) => {
@@ -730,6 +733,7 @@ export default function Auth() {
                 <CustomButton 
                   type="button"
                   size="sm"
+                  className="h-10 sm:h-11 px-3 sm:px-4"
                   onClick={() => {
                     if (tempInjuries.trim()) {
                       handleArrayInput('injuries', tempInjuries);
@@ -737,12 +741,12 @@ export default function Auth() {
                     }
                   }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 </CustomButton>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.injuries.map((injury, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center gap-1">
+                  <Badge key={index} variant="outline" className="flex items-center gap-1 text-xs px-2 py-1">
                     {injury}
                     <X className="w-3 h-3 cursor-pointer" onClick={() => removeArrayItem('injuries', index)} />
                   </Badge>
@@ -754,12 +758,12 @@ export default function Auth() {
 
       case 6:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label className="text-foreground font-medium">Lembretes de Refeições</Label>
-                  <p className="text-sm text-muted-foreground">Receber notificações para refeições</p>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-foreground font-medium text-sm sm:text-base">Lembretes de Refeições</Label>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Receber notificações para refeições</p>
                 </div>
                 <Switch
                   checked={formData.notifications.meals}
@@ -771,9 +775,9 @@ export default function Auth() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label className="text-foreground font-medium">Lembretes de Treino</Label>
-                  <p className="text-sm text-muted-foreground">Receber notificações para treinos</p>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-foreground font-medium text-sm sm:text-base">Lembretes de Treino</Label>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Receber notificações para treinos</p>
                 </div>
                 <Switch
                   checked={formData.notifications.workouts}
@@ -785,9 +789,9 @@ export default function Auth() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label className="text-foreground font-medium">Atualizações de Progresso</Label>
-                  <p className="text-sm text-muted-foreground">Receber insights da IA</p>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-foreground font-medium text-sm sm:text-base">Atualizações de Progresso</Label>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Receber insights da IA</p>
                 </div>
                 <Switch
                   checked={formData.notifications.progress}
@@ -799,9 +803,9 @@ export default function Auth() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label className="text-foreground font-medium">Lembretes Gerais</Label>
-                  <p className="text-sm text-muted-foreground">Receber lembretes diários</p>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-foreground font-medium text-sm sm:text-base">Lembretes Gerais</Label>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Receber lembretes diários</p>
                 </div>
                 <Switch
                   checked={formData.notifications.reminders}
@@ -813,9 +817,9 @@ export default function Auth() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label className="text-foreground font-medium">Conquistas</Label>
-                  <p className="text-sm text-muted-foreground">Receber notificações de conquistas</p>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-foreground font-medium text-sm sm:text-base">Conquistas</Label>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Receber notificações de conquistas</p>
                 </div>
                 <Switch
                   checked={formData.notifications.achievements}
@@ -827,9 +831,9 @@ export default function Auth() {
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <Label className="text-foreground font-medium">Relatórios Semanais</Label>
-                  <p className="text-sm text-muted-foreground">Receber resumos semanais</p>
+                <div className="flex-1 min-w-0">
+                  <Label className="text-foreground font-medium text-sm sm:text-base">Relatórios Semanais</Label>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Receber resumos semanais</p>
                 </div>
                 <Switch
                   checked={formData.notifications.weeklyReports}
@@ -849,26 +853,26 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-2 sm:p-4">
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-secondary" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.1),transparent_50%)]" />
       
-      <div className="relative z-10 w-full max-w-2xl">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md lg:max-w-2xl">
         {/* Back to home */}
-        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8">
-          <ArrowLeft className="w-4 h-4" />
+        <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-4 sm:mb-8 text-sm sm:text-base">
+          <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           Voltar ao início
         </Link>
 
-        <Card className="glass-card p-8 rounded-2xl">
+        <Card className="glass-card p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl">
           {/* Logo */}
-          <div className="text-center mb-8">
-            <Logo className="justify-center mb-4" />
-            <h2 className="text-2xl font-orbitron font-bold text-foreground">
+          <div className="text-center mb-6 sm:mb-8">
+            <Logo className="justify-center mb-3 sm:mb-4" size="sm" />
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-orbitron font-bold text-foreground">
               {isLogin ? "Bem-vindo de volta" : "Crie sua conta"}
             </h2>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-sm sm:text-base text-muted-foreground mt-2">
               {isLogin 
                 ? "Entre para continuar sua jornada fitness" 
                 : "Comece sua transformação hoje mesmo"
@@ -878,54 +882,93 @@ export default function Auth() {
 
           {/* Progress Steps */}
           {!isLogin && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                {STEPS.map((step, index) => (
-                  <div key={step.id} className="flex items-center">
-                    <div 
-                      className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors cursor-pointer ${
-                        step.id < currentStep 
-                          ? 'bg-primary border-primary text-primary-foreground' 
-                          : step.id === currentStep
-                          ? 'border-primary text-primary'
-                          : 'border-border text-muted-foreground'
-                      }`}
-                      onClick={() => goToStep(step.id)}
-                    >
-                      {step.id < currentStep ? (
-                        <CheckCircle className="w-5 h-5" />
-                      ) : (
-                        <span className="text-sm font-medium">{step.id}</span>
+            <div className="mb-6 sm:mb-8">
+              {/* Mobile Progress Steps */}
+              <div className="block sm:hidden mb-4">
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  {STEPS.map((step, index) => (
+                    <div key={step.id} className="flex items-center">
+                      <div 
+                        className={`flex items-center justify-center w-6 h-6 rounded-full border-2 transition-colors cursor-pointer text-xs ${
+                          step.id < currentStep 
+                            ? 'bg-primary border-primary text-primary-foreground' 
+                            : step.id === currentStep
+                            ? 'border-primary text-primary'
+                            : 'border-border text-muted-foreground'
+                        }`}
+                        onClick={() => goToStep(step.id)}
+                      >
+                        {step.id < currentStep ? (
+                          <CheckCircle className="w-3 h-3" />
+                        ) : (
+                          <span className="text-xs font-medium">{step.id}</span>
+                        )}
+                      </div>
+                      {index < STEPS.length - 1 && (
+                        <div className={`w-8 h-0.5 mx-1 ${
+                          step.id < currentStep ? 'bg-primary' : 'bg-border'
+                        }`} />
                       )}
                     </div>
-                    {index < STEPS.length - 1 && (
-                      <div className={`w-16 h-0.5 mx-2 ${
-                        step.id < currentStep ? 'bg-primary' : 'bg-border'
-                      }`} />
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">
+                    {currentStep} de {STEPS.length}: {STEPS[currentStep - 1].title}
+                  </p>
+                </div>
               </div>
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Passo {currentStep} de {STEPS.length}: {STEPS[currentStep - 1].title}
-                </p>
+
+              {/* Desktop Progress Steps */}
+              <div className="hidden sm:block">
+                <div className="flex items-center justify-between mb-4">
+                  {STEPS.map((step, index) => (
+                    <div key={step.id} className="flex items-center">
+                      <div 
+                        className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors cursor-pointer ${
+                          step.id < currentStep 
+                            ? 'bg-primary border-primary text-primary-foreground' 
+                            : step.id === currentStep
+                            ? 'border-primary text-primary'
+                            : 'border-border text-muted-foreground'
+                        }`}
+                        onClick={() => goToStep(step.id)}
+                      >
+                        {step.id < currentStep ? (
+                          <CheckCircle className="w-5 h-5" />
+                        ) : (
+                          <span className="text-sm font-medium">{step.id}</span>
+                        )}
+                      </div>
+                      {index < STEPS.length - 1 && (
+                        <div className={`w-16 h-0.5 mx-2 ${
+                          step.id < currentStep ? 'bg-primary' : 'bg-border'
+                        }`} />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Passo {currentStep} de {STEPS.length}: {STEPS[currentStep - 1].title}
+                  </p>
+                </div>
               </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {!isLogin ? renderStepContent() : (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">E-mail</Label>
+                  <Label htmlFor="email" className="text-foreground text-sm sm:text-base">E-mail</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                     <Input 
                       id="email"
                       type="email"
                       placeholder="seu@email.com"
-                      className="pl-10 bg-input/50 border-border/50"
+                      className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       required
@@ -934,14 +977,14 @@ export default function Auth() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-foreground">Senha</Label>
+                  <Label htmlFor="password" className="text-foreground text-sm sm:text-base">Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                     <Input 
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      className="pl-10 bg-input/50 border-border/50"
+                      className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
                       required
@@ -951,7 +994,7 @@ export default function Auth() {
               </>
             )}
 
-            <CustomButton type="submit" size="lg" className="w-full" disabled={loading}>
+            <CustomButton type="submit" size="lg" className="w-full h-12 sm:h-14 text-base sm:text-lg" disabled={loading}>
               {loading ? "Processando..." : (
                 isLogin ? "Entrar" : 
                 currentStep < STEPS.length ? "Próximo" : "Criar conta"
@@ -963,10 +1006,10 @@ export default function Auth() {
                 type="button"
                 variant="outline"
                 size="lg"
-                className="w-full"
+                className="w-full h-12 sm:h-14 text-base sm:text-lg"
                 onClick={() => setCurrentStep(currentStep - 1)}
               >
-                <ArrowLeftCircle className="w-4 h-4 mr-2" />
+                <ArrowLeftCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Voltar
               </CustomButton>
             )}
@@ -981,7 +1024,7 @@ export default function Auth() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm sm:text-base">
               {isLogin ? "Não tem uma conta?" : "Já tem uma conta?"}
             </p>
             <CustomButton 
@@ -1021,7 +1064,7 @@ export default function Auth() {
                   }
                 });
               }}
-              className="mt-2"
+              className="mt-2 h-10 sm:h-11 text-sm sm:text-base"
             >
               {isLogin ? "Criar conta gratuita" : "Fazer login"}
             </CustomButton>
@@ -1029,11 +1072,11 @@ export default function Auth() {
         </Card>
 
         {!isLogin && (
-          <div className="text-center mt-6 p-4 glass-card rounded-lg">
-            <p className="text-sm text-muted-foreground">
+          <div className="text-center mt-4 sm:mt-6 p-3 sm:p-4 glass-card rounded-lg">
+            <p className="text-sm sm:text-base text-muted-foreground">
               ✨ <span className="text-success font-semibold">7 dias grátis</span> para testar todos os recursos
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
               A IA criará planos personalizados baseados nas suas informações
             </p>
           </div>
