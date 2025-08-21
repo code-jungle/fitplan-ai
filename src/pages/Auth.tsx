@@ -118,6 +118,7 @@ export default function Auth() {
     }
   });
   const [loading, setLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -137,8 +138,30 @@ export default function Auth() {
     return null;
   }
 
+  const validatePasswords = () => {
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordError('As senhas não coincidem');
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setPasswordError('A senha deve ter pelo menos 6 caracteres');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isLogin && currentStep === 1) {
+      // Validate passwords before proceeding to next step
+      if (!validatePasswords()) {
+        return;
+      }
+      setCurrentStep(2);
+      return;
+    }
     
     if (!isLogin && currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
@@ -246,13 +269,24 @@ export default function Auth() {
                   id="password"
                   type="password"
                   placeholder="••••••••"
-                  className="pl-10 bg-input/50 border-border/50"
+                  className={`pl-10 bg-input/50 border-border/50 ${
+                    passwordError && formData.password !== formData.confirmPassword 
+                      ? 'border-destructive' 
+                      : ''
+                  }`}
                   value={formData.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  onChange={(e) => {
+                    handleInputChange('password', e.target.value);
+                    // Clear error when user starts typing
+                    if (passwordError) {
+                      setPasswordError('');
+                    }
+                  }}
                   required
                 />
               </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword" className="text-foreground">Confirmar Senha</Label>
               <div className="relative">
@@ -261,12 +295,28 @@ export default function Auth() {
                   id="confirmPassword"
                   type="password"
                   placeholder="••••••••"
-                  className="pl-10 bg-input/50 border-border/50"
+                  className={`pl-10 bg-input/50 border-border/50 ${
+                    passwordError && formData.password !== formData.confirmPassword 
+                      ? 'border-destructive' 
+                      : ''
+                  }`}
                   value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                  onChange={(e) => {
+                    handleInputChange('confirmPassword', e.target.value);
+                    // Clear error when user starts typing
+                    if (passwordError) {
+                      setPasswordError('');
+                    }
+                  }}
                   required
                 />
               </div>
+              {passwordError && (
+                <p className="text-sm text-destructive mt-1 flex items-center gap-2">
+                  <span className="w-1 h-1 bg-destructive rounded-full"></span>
+                  {passwordError}
+                </p>
+              )}
             </div>
           </div>
         );
