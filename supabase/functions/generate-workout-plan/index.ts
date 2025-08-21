@@ -4,8 +4,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 // Security: Restrict CORS to specific origins
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://localhost:8080', // Keep for backward compatibility
-  'https://yourdomain.com' // Replace with your actual domain
+  'http://localhost:8080',
+  'https://fitplan-ai.vercel.app'
 ];
 
 const corsHeaders = (origin: string) => ({
@@ -59,11 +59,12 @@ serve(async (req) => {
         error: 'Usuário não autenticado' 
       }), {
         status: 401,
-        headers: { ...headers, 'ContentType': 'application/json' }
+        headers: { ...headers, 'Content-Type': 'application/json' }
       });
     }
 
     const user = userData.user;
+    
     // Security: Validate request body
     let requestBody;
     try {
@@ -77,21 +78,12 @@ serve(async (req) => {
       });
     }
     
-    const { targetDate, workoutType } = requestBody;
+    const { targetDate } = requestBody;
     
-    // Security: Validate input parameters
+    // Security: Validate targetDate if provided
     if (targetDate && typeof targetDate !== 'string') {
       return new Response(JSON.stringify({ 
         error: 'Data de destino deve ser uma string válida' 
-      }), {
-        status: 400,
-        headers: { ...headers, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    if (workoutType && typeof workoutType !== 'string') {
-      return new Response(JSON.stringify({ 
-        error: 'Tipo de treino deve ser uma string válida' 
       }), {
         status: 400,
         headers: { ...headers, 'Content-Type': 'application/json' }
@@ -126,7 +118,7 @@ serve(async (req) => {
       console.error('Erro ao carregar preferências de treino:', workoutError);
     }
 
-    // Carregar preferências de dieta para considerar lesões
+    // Carregar preferências dietéticas para considerar lesões
     const { data: dietData, error: dietError } = await supabaseClient
       .from('dietary_preferences')
       .select('*')
@@ -134,117 +126,327 @@ serve(async (req) => {
       .single();
 
     if (dietError && dietError.code !== 'PGRST116') {
-      console.error('Erro ao carregar preferências de dieta:', dietError);
+      console.error('Erro ao carregar preferências dietéticas:', dietError);
     }
 
-    // Mapear nível de atividade para dificuldade
-    const difficultyMap: { [key: string]: string } = {
-      'sedentario': 'iniciante',
-      'leve': 'iniciante',
-      'moderado': 'intermediario',
-      'intenso': 'avancado',
-      'muito_intenso': 'avancado'
-    };
-    
-    const difficulty = difficultyMap[profileData?.activity_level || 'moderado'] || 'intermediario';
+    // Gerar plano de treino personalizado
+    const workoutPlan = generatePersonalizedWorkoutPlan(profileData, workoutData, dietData);
 
-    // Gerar prompt para a IA Gemini baseado no perfil real
-    const prompt = `
-Crie um treino personalizado para hoje baseado nas seguintes informações:
-
-Perfil do usuário:
-- Nome: ${profileData?.full_name || 'não informado'}
-- Idade: ${profileData?.age || 'não informado'} anos
-- Peso: ${profileData?.weight || 'não informado'} kg
-- Altura: ${profileData?.height || 'não informado'} cm
-- Gênero: ${profileData?.gender || 'não informado'}
-- Nível de atividade: ${profileData?.activity_level || 'moderado'}
-- Objetivos: ${profileData?.goals?.join(', ') || 'manter forma'}
-- Tipo de treino solicitado: ${workoutType || workoutData?.workout_type || 'geral'}
-- Duração preferida: ${workoutData?.workout_duration || '60min'}
-- Dias de treino por semana: ${workoutData?.workout_days || 3}
-- Horário preferido: ${workoutData?.preferred_time || 'flexível'}
-- Nível de dificuldade: ${difficulty}
-- Lesões/Problemas: ${dietData?.injuries?.join(', ') || 'nenhum'}
-
-Preciso que você retorne APENAS um JSON válido no seguinte formato:
-{
-  "workout_type": "Nome do tipo de treino",
-  "duration_minutes": 45,
-  "difficulty_level": "intermediario",
-  "exercises": [
-    {
-      "name": "Nome do exercício",
-      "sets": 3,
-      "reps": "12-15",
-      "rest_seconds": 60,
-      "instructions": "Como executar o exercício",
-      "muscle_groups": ["pernas", "glúteos"]
-    }
-  ],
-  "warm_up": {
-    "duration_minutes": 5,
-    "exercises": ["Exercícios de aquecimento"]
-  },
-  "cool_down": {
-    "duration_minutes": 5,
-    "exercises": ["Exercícios de relaxamento"]
-  }
-}
-
-Crie um treino adequado para academia ou casa, com exercícios seguros e progressivos.
-Considere as lesões e limitações do usuário para criar um treino seguro e personalizado.
-`;
-
-    // Chamar API do Gemini
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${Deno.env.get('GEMINI_API_KEY')}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: prompt }]
-          }]
-        })
-      }
-    );
-
-    const geminiData = await geminiResponse.json();
-    const generatedText = geminiData.candidates[0]?.content?.parts[0]?.text || '';
-    
-    // Extrair JSON do texto gerado
-    const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Falha ao gerar treino válido');
-    }
-
-    const workoutPlan = JSON.parse(jsonMatch[0]);
-
-    // Salvar no banco de dados
-    await supabaseClient
-      .from('workout_plans')
-      .upsert({
-        user_id: user.id,
-        plan_date: targetDate || new Date().toISOString().split('T')[0],
-        workout_type: workoutPlan.workout_type,
-        exercises: workoutPlan.exercises,
-        duration_minutes: workoutPlan.duration_minutes,
-        difficulty_level: workoutPlan.difficulty_level,
-        generated_by_ai: true
-      });
-
-    return new Response(JSON.stringify(workoutPlan), {
+    return new Response(JSON.stringify({ 
+      success: true,
+      workoutPlan,
+      message: 'Plano de treino gerado com sucesso'
+    }), {
+      status: 200,
       headers: { ...headers, 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    console.error('Erro ao gerar treino:', error);
+    console.error('Erro interno:', error);
     return new Response(JSON.stringify({ 
-      error: 'Erro interno do servidor' // Don't expose internal error details
+      error: 'Erro interno do servidor' 
     }), {
       status: 500,
       headers: { ...headers, 'Content-Type': 'application/json' }
-      });
+    });
   }
 });
+
+function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, dietPreferences: any) {
+  // Dados do usuário para personalização
+  const { full_name, age, weight, height, gender, activity_level, goals } = profile;
+  const { workout_type, workout_duration, workout_days, preferred_time } = workoutPreferences || {};
+  const { injuries } = dietPreferences || {};
+  
+  // Determinar intensidade baseada no nível de atividade e objetivos
+  const intensity = determineWorkoutIntensity(activity_level, goals?.[0]);
+  
+  // Gerar treinos baseados no tipo e intensidade
+  const workouts = generateWorkouts(workout_type, intensity, injuries);
+  
+  // Calcular duração baseada nas preferências
+  const duration = workout_duration || '60min';
+  const days = workout_days || 3;
+  
+  return {
+    userInfo: {
+      name: full_name,
+      age,
+      weight,
+      height,
+      gender,
+      activityLevel: activity_level,
+      goals
+    },
+    workoutPreferences: {
+      type: workout_type || 'mixed',
+      duration,
+      days,
+      preferredTime: preferred_time || 'flexible'
+    },
+    intensity,
+    workouts,
+    schedule: generateWorkoutSchedule(days, preferred_time),
+    recommendations: generateWorkoutRecommendations(workout_type, goals?.[0], injuries),
+    safetyNotes: generateSafetyNotes(injuries, age, activity_level)
+  };
+}
+
+function determineWorkoutIntensity(activityLevel: string, goal: string): string {
+  const intensityMap = {
+    'sedentario': 'beginner',
+    'leve': 'beginner',
+    'moderado': 'intermediate',
+    'intenso': 'advanced',
+    'muito_intenso': 'advanced'
+  };
+  
+  let baseIntensity = intensityMap[activityLevel] || 'beginner';
+  
+  // Ajustar baseado no objetivo
+  if (goal === 'muscle_gain' && baseIntensity === 'beginner') {
+    baseIntensity = 'intermediate';
+  } else if (goal === 'weight_loss' && baseIntensity === 'advanced') {
+    baseIntensity = 'intermediate';
+  }
+  
+  return baseIntensity;
+}
+
+function generateWorkouts(workoutType: string, intensity: string, injuries: string[]) {
+  const workoutDatabase = {
+    mixed: {
+      beginner: [
+        {
+          name: "Treino Full Body",
+          focus: "Corpo completo",
+          duration: "45 min",
+          exercises: [
+            { name: "Agachamento com peso corporal", sets: 3, reps: "12-15", rest: "60s" },
+            { name: "Flexão de braço (joelhos)", sets: 3, reps: "8-12", rest: "60s" },
+            { name: "Prancha", sets: 3, reps: "30s", rest: "60s" },
+            { name: "Agachamento sumo", sets: 3, reps: "12-15", rest: "60s" },
+            { name: "Remada com elástico", sets: 3, reps: "12-15", rest: "60s" }
+          ]
+        }
+      ],
+      intermediate: [
+        {
+          name: "Treino Upper/Lower",
+          focus: "Superior/Inferior",
+          duration: "60 min",
+          exercises: [
+            { name: "Agachamento livre", sets: 4, reps: "8-12", rest: "90s" },
+            { name: "Supino reto", sets: 4, reps: "8-12", rest: "90s" },
+            { name: "Puxada na frente", sets: 4, reps: "8-12", rest: "90s" },
+            { name: "Leg press", sets: 4, reps: "10-15", rest: "90s" },
+            { name: "Desenvolvimento militar", sets: 3, reps: "8-12", rest: "90s" }
+          ]
+        }
+      ],
+      advanced: [
+        {
+          name: "Treino Push/Pull/Legs",
+          focus: "Empurrar/Puxar/Pernas",
+          duration: "75 min",
+          exercises: [
+            { name: "Agachamento livre", sets: 5, reps: "5-8", rest: "120s" },
+            { name: "Supino inclinado", sets: 4, reps: "6-10", rest: "120s" },
+            { name: "Puxada na frente", sets: 4, reps: "6-10", rest: "120s" },
+            { name: "Stiff", sets: 4, reps: "8-12", rest: "90s" },
+            { name: "Desenvolvimento com halteres", sets: 4, reps: "8-12", rest: "90s" }
+          ]
+        }
+      ]
+    },
+    strength: {
+      beginner: [
+        {
+          name: "Treino de Força Básico",
+          focus: "Força fundamental",
+          duration: "50 min",
+          exercises: [
+            { name: "Agachamento com barra", sets: 3, reps: "5-8", rest: "120s" },
+            { name: "Supino reto", sets: 3, reps: "5-8", rest: "120s" },
+            { name: "Puxada na frente", sets: 3, reps: "5-8", rest: "120s" },
+            { name: "Stiff", sets: 3, reps: "5-8", rest: "120s" },
+            { name: "Desenvolvimento militar", sets: 3, reps: "5-8", rest: "120s" }
+          ]
+        }
+      ],
+      intermediate: [
+        {
+          name: "Treino de Força Intermediário",
+          focus: "Força avançada",
+          duration: "70 min",
+          exercises: [
+            { name: "Agachamento livre", sets: 5, reps: "3-5", rest: "180s" },
+            { name: "Supino inclinado", sets: 4, reps: "3-5", rest: "180s" },
+            { name: "Puxada na frente", sets: 4, reps: "3-5", rest: "180s" },
+            { name: "Stiff", sets: 4, reps: "3-5", rest: "180s" },
+            { name: "Desenvolvimento com halteres", sets: 4, reps: "3-5", rest: "180s" }
+          ]
+        }
+      ],
+      advanced: [
+        {
+          name: "Treino de Força Avançado",
+          focus: "Força máxima",
+          duration: "90 min",
+          exercises: [
+            { name: "Agachamento livre", sets: 6, reps: "1-3", rest: "240s" },
+            { name: "Supino inclinado", sets: 5, reps: "1-3", rest: "240s" },
+            { name: "Puxada na frente", sets: 5, reps: "1-3", rest: "240s" },
+            { name: "Stiff", sets: 5, reps: "1-3", rest: "240s" },
+            { name: "Desenvolvimento com halteres", sets: 5, reps: "1-3", rest: "240s" }
+          ]
+        }
+      ]
+    },
+    cardio: {
+      beginner: [
+        {
+          name: "Treino Cardio Básico",
+          focus: "Resistência cardiovascular",
+          duration: "30 min",
+          exercises: [
+            { name: "Caminhada rápida", sets: 1, reps: "20 min", rest: "0s" },
+            { name: "Corrida leve", sets: 1, reps: "10 min", rest: "0s" },
+            { name: "Alongamento", sets: 1, reps: "5 min", rest: "0s" }
+          ]
+        }
+      ],
+      intermediate: [
+        {
+          name: "Treino HIIT",
+          focus: "Alta intensidade",
+          duration: "45 min",
+          exercises: [
+            { name: "Corrida intensa", sets: 8, reps: "30s", rest: "90s" },
+            { name: "Burpee", sets: 8, reps: "30s", rest: "90s" },
+            { name: "Mountain climber", sets: 8, reps: "30s", rest: "90s" },
+            { name: "Jumping jack", sets: 8, reps: "30s", rest: "90s" }
+          ]
+        }
+      ],
+      advanced: [
+        {
+          name: "Treino Cardio Avançado",
+          focus: "Endurance máxima",
+          duration: "60 min",
+          exercises: [
+            { name: "Corrida contínua", sets: 1, reps: "45 min", rest: "0s" },
+            { name: "Sprint", sets: 10, reps: "100m", rest: "120s" },
+            { name: "Alongamento dinâmico", sets: 1, reps: "10 min", rest: "0s" }
+          ]
+        }
+      ]
+    }
+  };
+
+  // Filtrar exercícios baseado em lesões
+  const safeWorkouts = workoutDatabase[workoutType]?.[intensity] || workoutDatabase.mixed[intensity];
+  
+  if (injuries && injuries.length > 0) {
+    return safeWorkouts.map(workout => ({
+      ...workout,
+      exercises: workout.exercises.filter(exercise => 
+        !injuries.some(injury => 
+          exercise.name.toLowerCase().includes(injury.toLowerCase())
+        )
+      ),
+      safetyNote: `Ajustado para evitar exercícios que possam agravar: ${injuries.join(', ')}`
+    }));
+  }
+  
+  return safeWorkouts;
+}
+
+function generateWorkoutSchedule(days: number, preferredTime: string) {
+  const schedule = [];
+  const timeSlots = {
+    'morning': '06:00 - 08:00',
+    'afternoon': '12:00 - 14:00',
+    'evening': '18:00 - 20:00',
+    'flexible': 'Flexível'
+  };
+  
+  for (let i = 1; i <= days; i++) {
+    schedule.push({
+      day: `Dia ${i}`,
+      time: timeSlots[preferredTime] || timeSlots.flexible,
+      focus: i % 2 === 0 ? 'Superior' : 'Inferior'
+    });
+  }
+  
+  return schedule;
+}
+
+function generateWorkoutRecommendations(workoutType: string, goal: string, injuries: string[]) {
+  const recommendations = {
+    general: [
+      "Sempre faça aquecimento antes do treino",
+      "Mantenha a técnica correta em todos os exercícios",
+      "Hidrate-se adequadamente durante o treino",
+      "Descanse adequadamente entre as sessões"
+    ],
+    strength: [
+      "Foque na progressão de carga",
+      "Mantenha boa forma técnica",
+      "Use cargas que permitam 6-12 repetições",
+      "Descanse 2-3 minutos entre séries pesadas"
+    ],
+    cardio: [
+      "Mantenha frequência cardíaca controlada",
+      "Aumente gradualmente a intensidade",
+      "Combine diferentes tipos de cardio",
+      "Monitore sua respiração"
+    ],
+    weight_loss: [
+      "Mantenha alta intensidade",
+      "Reduza o descanso entre exercícios",
+      "Inclua exercícios compostos",
+      "Foque em queima calórica"
+    ],
+    muscle_gain: [
+      "Progressive overload é fundamental",
+      "Foque em exercícios compostos",
+      "Mantenha volume de treino alto",
+      "Descanse adequadamente para recuperação"
+    ]
+  };
+
+  let selectedRecommendations = [...recommendations.general];
+  
+  if (workoutType) {
+    selectedRecommendations.push(...(recommendations[workoutType] || []));
+  }
+  
+  if (goal) {
+    selectedRecommendations.push(...(recommendations[goal] || []));
+  }
+  
+  return selectedRecommendations;
+}
+
+function generateSafetyNotes(injuries: string[], age: number, activityLevel: string) {
+  const notes = [];
+  
+  if (injuries && injuries.length > 0) {
+    notes.push(`⚠️ ATENÇÃO: Evite exercícios que possam agravar: ${injuries.join(', ')}`);
+  }
+  
+  if (age > 50) {
+    notes.push("👴 Para usuários acima de 50 anos, priorize exercícios de baixo impacto");
+  }
+  
+  if (activityLevel === 'sedentario') {
+    notes.push("🚶 Comece gradualmente e aumente a intensidade ao longo do tempo");
+  }
+  
+  if (notes.length === 0) {
+    notes.push("✅ Nenhuma restrição especial identificada");
+  }
+  
+  return notes;
+}

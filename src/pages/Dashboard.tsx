@@ -18,16 +18,21 @@ import {
   LogOut,
   CreditCard,
   Plus,
-  Info
+  Info,
+  Settings
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [generatingMeal, setGeneratingMeal] = useState(false);
+  const [generatingWorkout, setGeneratingWorkout] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -85,12 +90,144 @@ export default function Dashboard() {
     }
   };
 
+  // Calcular calorias baseado no perfil do usuário
+  const calculateDailyCalories = () => {
+    if (!dashboardData?.profile) return 0;
+    
+    const { weight, height, age, gender, activity_level } = dashboardData.profile;
+    
+    if (!weight || !height || !age) return 0;
+    
+    // Fórmula de Harris-Benedict para TMB (Taxa Metabólica Basal)
+    let bmr = 0;
+    if (gender === 'masculino') {
+      bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+    } else {
+      bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+    }
+    
+    // Multiplicador de atividade
+    const activityMultipliers = {
+      'sedentario': 1.2,
+      'leve': 1.375,
+      'moderado': 1.55,
+      'intenso': 1.725,
+      'muito_intenso': 1.9
+    };
+    
+    const multiplier = activityMultipliers[activity_level] || 1.2;
+    const dailyCalories = Math.round(bmr * multiplier);
+    
+    // Ajustar baseado no objetivo
+    const primaryGoal = dashboardData.profile.goals?.[0];
+    if (primaryGoal === 'weight_loss') {
+      return Math.round(dailyCalories * 0.85); // Déficit de 15%
+    } else if (primaryGoal === 'muscle_gain') {
+      return Math.round(dailyCalories * 1.1); // Superávit de 10%
+    }
+    
+    return dailyCalories;
+  };
+
+  // Gerar plano alimentar com IA
+  const generateMealPlan = async () => {
+    if (!user?.id) return;
+    
+    setGeneratingMeal(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-meal-plan', {
+        body: { targetDate: new Date().toISOString().split('T')[0] }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.mealPlan) {
+        // Salvar plano no banco
+        const { error: saveError } = await supabase
+          .from('meal_plans')
+          .upsert([{
+            user_id: user.id,
+            plan_date: new Date().toISOString().split('T')[0],
+            plan_data: data.mealPlan,
+            created_at: new Date().toISOString()
+          }]);
+        
+        if (!saveError) {
+          toast({
+            title: "🍽️ Plano alimentar gerado!",
+            description: "Sua dieta personalizada foi criada com sucesso pela IA.",
+          });
+          loadDashboardData(); // Recarregar dados
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao gerar plano alimentar:', error);
+      toast({
+        title: "❌ Erro ao gerar plano",
+        description: "Não foi possível gerar o plano alimentar. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingMeal(false);
+    }
+  };
+
+  // Gerar plano de treino com IA
+  const generateWorkoutPlan = async () => {
+    if (!user?.id) return;
+    
+    setGeneratingWorkout(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-workout-plan', {
+        body: { targetDate: new Date().toISOString().split('T')[0] }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.workoutPlan) {
+        // Salvar plano no banco
+        const { error: saveError } = await supabase
+          .from('workout_plans')
+          .upsert([{
+            user_id: user.id,
+            plan_date: new Date().toISOString().split('T')[0],
+            plan_data: data.workoutPlan,
+            created_at: new Date().toISOString()
+          }]);
+        
+        if (!saveError) {
+          toast({
+            title: "💪 Plano de treino gerado!",
+            description: "Seu programa de exercícios foi criado com sucesso pela IA.",
+          });
+          loadDashboardData(); // Recarregar dados
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao gerar plano de treino:', error);
+      toast({
+        title: "❌ Erro ao gerar treino",
+        description: "Não foi possível gerar o plano de treino. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingWorkout(false);
+    }
+  };
+
+  // Configurar metas
+  const configureGoals = () => {
+    navigate('/profile');
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Usuário';
+  const dailyCalories = calculateDailyCalories();
+  
   return (
     <div className="min-h-screen bg-gradient-secondary">
       {/* Header */}
@@ -101,62 +238,58 @@ export default function Dashboard() {
           <div className="hidden sm:flex items-center gap-4">
             <Link to="/profile">
               <CustomButton variant="glass" size="sm">
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4 mr-2" />
                 Perfil
               </CustomButton>
             </Link>
             <Link to="/subscription">
               <CustomButton variant="glass" size="sm">
+                <CreditCard className="w-4 h-4 mr-2" />
                 Assinatura
               </CustomButton>
             </Link>
             <Link to="/progress">
               <CustomButton variant="glass" size="sm">
+                <TrendingUp className="w-4 h-4 mr-2" />
                 Progresso
               </CustomButton>
             </Link>
-            <CustomButton variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4" />
+            <CustomButton variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4 mr-2" />
               Sair
             </CustomButton>
           </div>
           {/* Mobile */}
           <div className="flex sm:hidden items-center gap-2">
-            <Link to="/profile" title="Perfil">
-              <CustomButton variant="glass" size="icon" aria-label="Perfil">
-                <User className="w-5 h-5" />
+            <Link to="/profile">
+              <CustomButton variant="glass" size="icon">
+                <User className="w-4 h-4" />
               </CustomButton>
             </Link>
-            <Link to="/subscription" title="Assinatura">
-              <CustomButton variant="glass" size="icon" aria-label="Assinatura">
-                <CreditCard className="w-5 h-5" />
+            <Link to="/subscription">
+              <CustomButton variant="glass" size="icon">
+                <CreditCard className="w-4 h-4" />
               </CustomButton>
             </Link>
-            <Link to="/progress" title="Progresso">
-              <CustomButton variant="glass" size="icon" aria-label="Progresso">
-                <TrendingUp className="w-5 h-5" />
+            <Link to="/progress">
+              <CustomButton variant="glass" size="icon">
+                <TrendingUp className="w-4 h-4" />
               </CustomButton>
             </Link>
-            <CustomButton
-              variant="ghost"
-              size="icon"
-              aria-label="Sair"
-              onClick={handleSignOut}
-              title="Sair"
-            >
-              <LogOut className="w-5 h-5" />
+            <CustomButton variant="outline" size="icon" onClick={handleSignOut}>
+              <LogOut className="w-4 h-4" />
             </CustomButton>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto p-6">
-        {/* Welcome section */}
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+        {/* Welcome Message */}
         <div className="mb-8">
-          <h1 className="text-3xl font-orbitron font-bold text-foreground mb-2">
-            Olá, <span className="text-gradient">{userName}</span>! 👋
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-bold text-foreground mb-2">
+            Olá, <span className="text-primary">{userName.toUpperCase()}</span>! 👋
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base">
             Vamos continuar sua jornada de transformação hoje
           </p>
         </div>
@@ -174,29 +307,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
-                {Array.from({ length: 2 }).map((_, index) => (
-                  <Card key={index} className="glass-card p-6 animate-pulse">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-muted rounded-lg"></div>
-                        <div>
-                          <div className="h-5 bg-muted rounded mb-2"></div>
-                          <div className="h-4 bg-muted rounded"></div>
-                        </div>
-                      </div>
-                      <div className="w-20 h-8 bg-muted rounded"></div>
-                    </div>
-                    <div className="space-y-4">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="h-16 bg-muted rounded-lg"></div>
-                      ))}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-              <div className="space-y-6">
                 <Card className="glass-card p-6 animate-pulse">
-                  <div className="h-6 bg-muted rounded mb-6"></div>
                   <div className="space-y-4">
                     <div className="h-20 bg-muted rounded"></div>
                     <div className="grid grid-cols-2 gap-4">
@@ -218,28 +329,36 @@ export default function Dashboard() {
                   label: "Meta Diária", 
                   value: dashboardData?.profile?.goals?.length ? "75%" : "N/A",
                   color: "text-success",
-                  description: dashboardData?.profile?.goals?.length ? "Metas definidas" : "Defina suas metas"
+                  description: dashboardData?.profile?.goals?.length ? "Metas definidas" : "Defina suas metas",
+                  action: dashboardData?.profile?.goals?.length ? null : configureGoals,
+                  actionText: "Configurar"
                 },
                 { 
                   icon: Activity, 
                   label: "Calorias", 
-                  value: dashboardData?.mealPlan ? "1,847" : "N/A",
+                  value: dailyCalories > 0 ? `${dailyCalories.toLocaleString()}` : "N/A",
                   color: "text-primary",
-                  description: dashboardData?.mealPlan ? "Plano ativo" : "Gere seu plano"
+                  description: dailyCalories > 0 ? "Meta diária calculada" : "Complete seu perfil",
+                  action: dailyCalories === 0 ? configureGoals : null,
+                  actionText: "Completar perfil"
                 },
                 { 
                   icon: Dumbbell, 
                   label: "Treinos", 
                   value: dashboardData?.workoutPlan ? "12" : "N/A",
                   color: "text-secondary",
-                  description: dashboardData?.workoutPlan ? "Treino de hoje" : "Gere seu treino"
+                  description: dashboardData?.workoutPlan ? "Treino de hoje" : "Gere seu treino",
+                  action: !dashboardData?.workoutPlan ? generateWorkoutPlan : null,
+                  actionText: "Gerar treino"
                 },
                 { 
                   icon: TrendingUp, 
                   label: "Progresso", 
                   value: dashboardData?.progress ? `${dashboardData.progress.weight}kg` : "N/A",
                   color: "text-warning",
-                  description: dashboardData?.progress ? "Último registro" : "Registre seu peso"
+                  description: dashboardData?.progress ? "Último registro" : "Registre seu peso",
+                  action: !dashboardData?.progress ? () => navigate('/progress') : null,
+                  actionText: "Registrar peso"
                 }
               ].map((stat, index) => (
                 <Card key={index} className="glass-card p-6 text-center">
@@ -247,6 +366,16 @@ export default function Dashboard() {
                   <p className="text-2xl font-orbitron font-bold text-foreground">{stat.value}</p>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+                  {stat.action && (
+                    <CustomButton 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-3 w-full"
+                      onClick={stat.action}
+                    >
+                      {stat.actionText}
+                    </CustomButton>
+                  )}
                 </Card>
               ))}
             </div>
@@ -268,8 +397,13 @@ export default function Dashboard() {
                         </p>
                       </div>
                     </div>
-                    <CustomButton variant="outline" size="sm">
-                      {dashboardData?.mealPlan ? "Ver completo" : "Gerar plano"}
+                    <CustomButton 
+                      variant="outline" 
+                      size="sm"
+                      onClick={generateMealPlan}
+                      disabled={generatingMeal}
+                    >
+                      {generatingMeal ? "Gerando..." : dashboardData?.mealPlan ? "Ver completo" : "Gerar plano"}
                     </CustomButton>
                   </div>
 
@@ -315,8 +449,13 @@ export default function Dashboard() {
                         </p>
                       </div>
                     </div>
-                    <CustomButton variant="outline" size="sm">
-                      {dashboardData?.workoutPlan ? "Iniciar treino" : "Gerar treino"}
+                    <CustomButton 
+                      variant="outline" 
+                      size="sm"
+                      onClick={generateWorkoutPlan}
+                      disabled={generatingWorkout}
+                    >
+                      {generatingWorkout ? "Gerando..." : dashboardData?.workoutPlan ? "Iniciar treino" : "Gerar treino"}
                     </CustomButton>
                   </div>
 
@@ -401,7 +540,7 @@ export default function Dashboard() {
                   <div className="space-y-3">
                     <div className="p-3 bg-success/10 border border-success/20 rounded-lg">
                       <p className="text-sm text-success-foreground">
-                        �� Parabéns! Você está 15% mais consistente que na semana passada.
+                        🎯 Parabéns! Você está 15% mais consistente que na semana passada.
                       </p>
                     </div>
                     

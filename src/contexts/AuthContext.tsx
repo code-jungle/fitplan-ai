@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any; data?: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Verifique seu e-mail para confirmar a conta.",
       });
 
-      return { error: null };
+      return { error: null, data };
     } catch (error: any) {
       console.error('Unexpected signup error:', error);
       toast({

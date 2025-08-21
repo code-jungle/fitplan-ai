@@ -179,8 +179,8 @@ export default function Auth() {
     
     if (isLogin) {
       // Handle login
-    setLoading(true);
-    try {
+      setLoading(true);
+      try {
         const { error } = await signIn(formData.email, formData.password);
         if (!error) {
           navigate('/dashboard');
@@ -189,15 +189,15 @@ export default function Auth() {
         console.error('Authentication error:', error);
       } finally {
         setLoading(false);
-        }
-      } else {
+      }
+    } else {
       // Handle signup completion
       setLoading(true);
       try {
-        const { error } = await signUp(formData.email, formData.password, formData.name);
-        if (!error) {
+        const { data, error } = await signUp(formData.email, formData.password, formData.name);
+        if (!error && data.user) {
           // Salvar perfil completo no banco de dados
-          const profileSaved = await saveUserProfile(user?.id || '');
+          const profileSaved = await saveUserProfile(data.user.id);
           if (profileSaved) {
             // Mostrar mensagem de sucesso com instruções de verificação
             toast({
@@ -219,16 +219,16 @@ export default function Auth() {
             });
             navigate('/dashboard');
           }
-      }
-    } catch (error: any) {
+        }
+      } catch (error: any) {
         console.error('Signup error:', error);
         toast({
           title: "Erro ao criar conta",
           description: "Tente novamente ou entre em contato com o suporte.",
           variant: "destructive"
         });
-    } finally {
-      setLoading(false);
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -359,10 +359,10 @@ export default function Auth() {
 
       return true;
     } catch (error) {
-      console.error('Erro ao salvar perfil completo:', error);
+      console.error('Erro ao salvar perfil:', error);
       toast({
         title: "Erro ao salvar perfil",
-        description: "Alguns dados podem não ter sido salvos. Você pode completar seu perfil depois.",
+        description: "Alguns dados podem não ter sido salvos. Complete seu perfil depois.",
         variant: "destructive"
       });
       return false;
