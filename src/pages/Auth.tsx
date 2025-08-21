@@ -97,12 +97,14 @@ export default function Auth() {
     gender: 'male',
     height: 0,
     weight: 0,
-    activityLevel: 'moderate',
+    activityLevel: 'sedentary',
     primaryGoal: 'general_fitness',
     secondaryGoals: [],
+    targetWeight: undefined,
+    targetDate: '',
     dietType: 'balanced',
     workoutType: 'mixed',
-    workoutDuration: '60min',
+    workoutDuration: '30min',
     workoutDays: 0,
     preferredWorkoutTime: 'flexible',
     allergies: [],
@@ -111,12 +113,12 @@ export default function Auth() {
     injuries: [],
     medicalConditions: [],
     notifications: {
-      meals: true,
-      workouts: true,
-      progress: true,
+      meals: false,
+      workouts: false,
+      progress: false,
       reminders: false,
-      achievements: true,
-      weeklyReports: true
+      achievements: false,
+      weeklyReports: false
     }
   });
   const [loading, setLoading] = useState(false);
@@ -1180,12 +1182,14 @@ export default function Auth() {
                   gender: 'male',
                   height: 0,
                   weight: 0,
-                  activityLevel: 'moderate',
+                  activityLevel: 'sedentary',
                   primaryGoal: 'general_fitness',
                   secondaryGoals: [],
+                  targetWeight: undefined,
+                  targetDate: '',
                   dietType: 'balanced',
                   workoutType: 'mixed',
-                  workoutDuration: '60min',
+                  workoutDuration: '30min',
                   workoutDays: 0,
                   preferredWorkoutTime: 'flexible',
                   allergies: [],
@@ -1194,12 +1198,12 @@ export default function Auth() {
                   injuries: [],
                   medicalConditions: [],
                   notifications: {
-                    meals: true,
-                    workouts: true,
-                    progress: true,
+                    meals: false,
+                    workouts: false,
+                    progress: false,
                     reminders: false,
-                    achievements: true,
-                    weeklyReports: true
+                    achievements: false,
+                    weeklyReports: false
                   }
                 });
               }}
