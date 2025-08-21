@@ -383,28 +383,28 @@ export default function Profile() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+              <div>
                   <Label htmlFor="targetWeight" className="text-sm font-medium mb-2 block">Peso Alvo (kg)</Label>
-                  <Input
-                    id="targetWeight"
-                    type="number"
-                    step="0.1"
-                    value={profile.fitnessGoals.targetWeight || ''}
-                    onChange={(e) => updateProfile('fitnessGoals', 'targetWeight', parseFloat(e.target.value))}
-                    disabled={!isEditing}
+                <Input
+                  id="targetWeight"
+                  type="number"
+                  step="0.1"
+                  value={profile.fitnessGoals.targetWeight || ''}
+                  onChange={(e) => updateProfile('fitnessGoals', 'targetWeight', parseFloat(e.target.value))}
+                  disabled={!isEditing}
                     className="bg-input/50 border-border/50 h-10 text-sm"
-                  />
-                </div>
-                <div>
+                />
+              </div>
+              <div>
                   <Label htmlFor="targetDate" className="text-sm font-medium mb-2 block">Data Alvo</Label>
-                  <Input
-                    id="targetDate"
-                    type="date"
-                    value={profile.fitnessGoals.targetDate || ''}
-                    onChange={(e) => updateProfile('fitnessGoals', 'targetDate', e.target.value)}
-                    disabled={!isEditing}
+                <Input
+                  id="targetDate"
+                  type="date"
+                  value={profile.fitnessGoals.targetDate || ''}
+                  onChange={(e) => updateProfile('fitnessGoals', 'targetDate', e.target.value)}
+                  disabled={!isEditing}
                     className="bg-input/50 border-border/50 h-10 text-sm"
-                  />
+                />
                 </div>
               </div>
 
