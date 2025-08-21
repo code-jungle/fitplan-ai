@@ -93,17 +93,17 @@ export default function Auth() {
     email: '',
     password: '',
     confirmPassword: '',
-    age: 25,
+    age: 0,
     gender: 'male',
-    height: 170,
-    weight: 70,
+    height: 0,
+    weight: 0,
     activityLevel: 'moderate',
     primaryGoal: 'general_fitness',
     secondaryGoals: [],
     dietType: 'balanced',
     workoutType: 'mixed',
     workoutDuration: '60min',
-    workoutDays: 3,
+    workoutDays: 0,
     preferredWorkoutTime: 'flexible',
     allergies: [],
     intolerances: [],
@@ -475,7 +475,7 @@ export default function Auth() {
                   type="number"
                   placeholder="25"
                   className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
-                  value={formData.age}
+                  value={formData.age || ''}
                   onChange={(e) => handleInputChange('age', parseInt(e.target.value))}
                   required
                 />
@@ -506,7 +506,7 @@ export default function Auth() {
                   type="number"
                   placeholder="170"
                   className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
-                  value={formData.height}
+                  value={formData.height || ''}
                   onChange={(e) => handleInputChange('height', parseInt(e.target.value))}
                   required
                 />
@@ -519,7 +519,7 @@ export default function Auth() {
                   step="0.1"
                   placeholder="70.0"
                   className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
-                  value={formData.weight}
+                  value={formData.weight || ''}
                   onChange={(e) => handleInputChange('weight', parseFloat(e.target.value))}
                   required
                 />
@@ -708,7 +708,7 @@ export default function Auth() {
                   max="7"
                   placeholder="3"
                   className="bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
-                  value={formData.workoutDays}
+                  value={formData.workoutDays || ''}
                   onChange={(e) => handleInputChange('workoutDays', parseInt(e.target.value))}
                   required
                 />
@@ -1176,17 +1176,17 @@ export default function Auth() {
                   email: '',
                   password: '',
                   confirmPassword: '',
-                  age: 25,
+                  age: 0,
                   gender: 'male',
-                  height: 170,
-                  weight: 70,
+                  height: 0,
+                  weight: 0,
                   activityLevel: 'moderate',
                   primaryGoal: 'general_fitness',
                   secondaryGoals: [],
                   dietType: 'balanced',
                   workoutType: 'mixed',
                   workoutDuration: '60min',
-                  workoutDays: 3,
+                  workoutDays: 0,
                   preferredWorkoutTime: 'flexible',
                   allergies: [],
                   intolerances: [],
