@@ -98,58 +98,74 @@ serve(async (req) => {
       });
     }
 
-    // Buscar perfil do usuário
-    const { data: profile } = await supabaseClient
+    // Carregar perfil completo do usuário do banco
+    const { data: profileData, error: profileError } = await supabaseClient
       .from('profiles')
       .select('*')
       .eq('user_id', user.id)
       .single();
 
-    // Verificar se o usuário tem acesso (trial ou assinatura ativa)
-    const { data: subscription } = await supabaseClient
-      .from('subscribers')
+    if (profileError) {
+      console.error('Erro ao carregar perfil:', profileError);
+      return new Response(JSON.stringify({ 
+        error: 'Erro ao carregar perfil do usuário' 
+      }), {
+        status: 500,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Carregar preferências de treino
+    const { data: workoutData, error: workoutError } = await supabaseClient
+      .from('workout_preferences')
       .select('*')
       .eq('user_id', user.id)
       .single();
 
-    const hasAccess = subscription && (
-      subscription.subscribed || 
-      (subscription.trial_ends_at && new Date(subscription.trial_ends_at) > new Date())
-    );
-
-    if (!hasAccess) {
-          return new Response(JSON.stringify({ 
-      error: 'Acesso negado. Assinatura necessária.' 
-    }), {
-      status: 403,
-      headers: { ...headers, 'Content-Type': 'application/json' }
-    });
+    if (workoutError && workoutError.code !== 'PGRST116') {
+      console.error('Erro ao carregar preferências de treino:', workoutError);
     }
 
-    // Determinar nível de dificuldade baseado no activity_level
-    const difficultyMap = {
+    // Carregar preferências de dieta para considerar lesões
+    const { data: dietData, error: dietError } = await supabaseClient
+      .from('dietary_preferences')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (dietError && dietError.code !== 'PGRST116') {
+      console.error('Erro ao carregar preferências de dieta:', dietError);
+    }
+
+    // Mapear nível de atividade para dificuldade
+    const difficultyMap: { [key: string]: string } = {
       'sedentario': 'iniciante',
       'leve': 'iniciante',
       'moderado': 'intermediario',
-      'intenso': 'intermediario',
+      'intenso': 'avancado',
       'muito_intenso': 'avancado'
     };
     
-    const difficulty = difficultyMap[profile?.activity_level || 'moderado'] || 'intermediario';
+    const difficulty = difficultyMap[profileData?.activity_level || 'moderado'] || 'intermediario';
 
-    // Gerar prompt para a IA Gemini baseado no perfil
+    // Gerar prompt para a IA Gemini baseado no perfil real
     const prompt = `
 Crie um treino personalizado para hoje baseado nas seguintes informações:
 
 Perfil do usuário:
-- Idade: ${profile?.age || 'não informado'} anos
-- Peso: ${profile?.weight || 'não informado'} kg
-- Altura: ${profile?.height || 'não informado'} m
-- Gênero: ${profile?.gender || 'não informado'}
-- Nível de atividade: ${profile?.activity_level || 'moderado'}
-- Objetivos: ${profile?.goals?.join(', ') || 'manter forma'}
-- Tipo de treino solicitado: ${workoutType || 'geral'}
+- Nome: ${profileData?.full_name || 'não informado'}
+- Idade: ${profileData?.age || 'não informado'} anos
+- Peso: ${profileData?.weight || 'não informado'} kg
+- Altura: ${profileData?.height || 'não informado'} cm
+- Gênero: ${profileData?.gender || 'não informado'}
+- Nível de atividade: ${profileData?.activity_level || 'moderado'}
+- Objetivos: ${profileData?.goals?.join(', ') || 'manter forma'}
+- Tipo de treino solicitado: ${workoutType || workoutData?.workout_type || 'geral'}
+- Duração preferida: ${workoutData?.workout_duration || '60min'}
+- Dias de treino por semana: ${workoutData?.workout_days || 3}
+- Horário preferido: ${workoutData?.preferred_time || 'flexível'}
 - Nível de dificuldade: ${difficulty}
+- Lesões/Problemas: ${dietData?.injuries?.join(', ') || 'nenhum'}
 
 Preciso que você retorne APENAS um JSON válido no seguinte formato:
 {
@@ -177,6 +193,7 @@ Preciso que você retorne APENAS um JSON válido no seguinte formato:
 }
 
 Crie um treino adequado para academia ou casa, com exercícios seguros e progressivos.
+Considere as lesões e limitações do usuário para criar um treino seguro e personalizado.
 `;
 
     // Chamar API do Gemini

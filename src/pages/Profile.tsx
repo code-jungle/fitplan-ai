@@ -30,6 +30,8 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { usePWA } from "@/hooks/use-pwa";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 interface UserProfile {
   personalInfo: {
@@ -57,6 +59,8 @@ interface UserProfile {
       workouts: boolean;
       progress: boolean;
       reminders: boolean;
+      achievements: boolean;
+      weeklyReports: boolean;
     };
   };
   restrictions: {
@@ -75,59 +79,199 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadUserProfile();
   }, []);
 
-  const loadUserProfile = () => {
-    // Mock data - in real app, this would come from API
-    setProfile({
-      personalInfo: {
-        name: user?.user_metadata?.full_name || 'Usuário',
-        email: user?.email || '',
-        age: 28,
-        gender: 'male',
-        height: 175,
-        weight: 78.5,
-        activityLevel: 'moderate'
-      },
-      fitnessGoals: {
-        primary: 'weight_loss',
-        secondary: ['muscle_gain', 'endurance'],
-        targetWeight: 75,
-        targetDate: '2024-05-01'
-      },
-      preferences: {
-        dietType: 'balanced',
-        workoutType: 'mixed',
-        workoutDuration: '60min',
-        workoutDays: 4,
-        notifications: {
-          meals: true,
-          workouts: true,
-          progress: true,
-          reminders: false
-        }
-      },
-      restrictions: {
-        allergies: ['Amendoim'],
-        intolerances: ['Lactose'],
-        medications: [],
-        injuries: ['Lesão no joelho direito (2022)']
+  const loadUserProfile = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      
+      // Carregar perfil principal
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Erro ao carregar perfil:', profileError);
+        return;
       }
-    });
+
+      // Carregar preferências de treino
+      const { data: workoutData, error: workoutError } = await supabase
+        .from('workout_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      // Carregar preferências de dieta
+      const { data: dietData, error: dietError } = await supabase
+        .from('dietary_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      // Carregar preferências de notificação
+      const { data: notificationData, error: notificationError } = await supabase
+        .from('notification_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      // Combinar todos os dados
+      const combinedProfile: UserProfile = {
+        personalInfo: {
+          name: profileData?.full_name || user?.user_metadata?.full_name || 'Usuário',
+          email: user?.email || '',
+          age: profileData?.age || 25,
+          gender: profileData?.gender === 'masculino' ? 'male' : 
+                  profileData?.gender === 'feminino' ? 'female' : 'other',
+          height: profileData?.height || 170,
+          weight: profileData?.weight || 70,
+          activityLevel: profileData?.activity_level === 'sedentario' ? 'sedentary' :
+                        profileData?.activity_level === 'leve' ? 'light' :
+                        profileData?.activity_level === 'moderado' ? 'moderate' :
+                        profileData?.activity_level === 'intenso' ? 'active' : 'very_active'
+        },
+        fitnessGoals: {
+          primary: profileData?.goals?.[0] || 'general_fitness',
+          secondary: profileData?.goals?.slice(1) || [],
+          targetWeight: profileData?.weight || 70,
+          targetDate: new Date().toISOString().split('T')[0]
+        },
+        preferences: {
+          dietType: dietData?.diet_type || 'balanced',
+          workoutType: workoutData?.workout_type || 'mixed',
+          workoutDuration: workoutData?.workout_duration || '60min',
+          workoutDays: workoutData?.workout_days || 3,
+          notifications: {
+            meals: notificationData?.meals ?? true,
+            workouts: notificationData?.workouts ?? true,
+            progress: notificationData?.progress ?? true,
+            reminders: notificationData?.reminders ?? false,
+            achievements: notificationData?.achievements ?? true,
+            weeklyReports: notificationData?.weekly_reports ?? true
+          }
+        },
+        restrictions: {
+          allergies: dietData?.allergies || [],
+          intolerances: dietData?.intolerances || [],
+          medications: dietData?.medications || [],
+          injuries: dietData?.injuries || []
+        }
+      };
+
+      setProfile(combinedProfile);
+    } catch (error) {
+      console.error('Erro ao carregar perfil:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = async () => {
+    if (!user?.id || !profile) return;
+
     setLoading(true);
     try {
-      // Save profile to API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // Salvar perfil principal
+      const profileData = {
+        full_name: profile.personalInfo.name,
+        age: profile.personalInfo.age,
+        gender: profile.personalInfo.gender === 'male' ? 'masculino' : 
+                profile.personalInfo.gender === 'female' ? 'feminino' : 'outro',
+        weight: profile.personalInfo.weight,
+        height: profile.personalInfo.height,
+        activity_level: profile.personalInfo.activityLevel === 'sedentary' ? 'sedentario' :
+                      profile.personalInfo.activityLevel === 'light' ? 'leve' :
+                      profile.personalInfo.activityLevel === 'moderate' ? 'moderado' :
+                      profile.personalInfo.activityLevel === 'active' ? 'intenso' : 'muito_intenso',
+        goals: [profile.fitnessGoals.primary, ...profile.fitnessGoals.secondary],
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert([{ user_id: user.id, ...profileData }]);
+
+      if (profileError) {
+        throw profileError;
+      }
+
+      // Salvar preferências de treino
+      const workoutData = {
+        user_id: user.id,
+        workout_type: profile.preferences.workoutType,
+        workout_duration: profile.preferences.workoutDuration,
+        workout_days: profile.preferences.workoutDays,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: workoutError } = await supabase
+        .from('workout_preferences')
+        .upsert([workoutData]);
+
+      if (workoutError) {
+        console.error('Erro ao salvar preferências de treino:', workoutError);
+      }
+
+      // Salvar preferências de dieta
+      const dietData = {
+        user_id: user.id,
+        diet_type: profile.preferences.dietType,
+        allergies: profile.restrictions.allergies,
+        intolerances: profile.restrictions.intolerances,
+        medications: profile.restrictions.medications,
+        injuries: profile.restrictions.injuries,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: dietError } = await supabase
+        .from('dietary_preferences')
+        .upsert([dietData]);
+
+      if (dietError) {
+        console.error('Erro ao salvar preferências de dieta:', dietError);
+      }
+
+      // Salvar preferências de notificação
+      const notificationData = {
+        user_id: user.id,
+        meals: profile.preferences.notifications.meals,
+        workouts: profile.preferences.notifications.workouts,
+        progress: profile.preferences.notifications.progress,
+        reminders: profile.preferences.notifications.reminders,
+        achievements: profile.preferences.notifications.achievements,
+        weekly_reports: profile.preferences.notifications.weeklyReports,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: notificationError } = await supabase
+        .from('notification_preferences')
+        .upsert([notificationData]);
+
+      if (notificationError) {
+        console.error('Erro ao salvar preferências de notificação:', notificationError);
+      }
+
       setIsEditing(false);
-      // Show success message
+      toast({
+        title: "Perfil atualizado!",
+        description: "Suas informações foram salvas com sucesso.",
+      });
     } catch (error) {
       console.error('Error saving profile:', error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar suas alterações. Tente novamente.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

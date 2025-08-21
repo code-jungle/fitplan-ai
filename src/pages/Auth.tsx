@@ -28,6 +28,8 @@ import {
 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface SignUpData {
   // Step 1: Basic Info
@@ -127,6 +129,7 @@ export default function Auth() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, signIn, signUp } = useAuth();
+  const { toast } = useToast();
 
   // Check URL parameters to determine initial mode
   useEffect(() => {
@@ -191,11 +194,27 @@ export default function Auth() {
       try {
         const { error } = await signUp(formData.email, formData.password, formData.name);
         if (!error) {
-          // Here you would typically save the additional profile data
-          navigate('/dashboard');
+          // Salvar perfil completo no banco de dados
+          const profileSaved = await saveUserProfile(user?.id || '');
+          if (profileSaved) {
+            navigate('/dashboard');
+          } else {
+            // Se não conseguir salvar o perfil, ainda permite navegar mas mostra aviso
+            toast({
+              title: "Conta criada com sucesso!",
+              description: "Mas alguns dados do perfil não foram salvos. Complete seu perfil depois.",
+              variant: "destructive"
+            });
+            navigate('/dashboard');
+          }
         }
       } catch (error: any) {
         console.error('Signup error:', error);
+        toast({
+          title: "Erro ao criar conta",
+          description: "Tente novamente ou entre em contato com o suporte.",
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
@@ -225,6 +244,116 @@ export default function Auth() {
   const goToStep = (step: number) => {
     if (step <= currentStep) {
       setCurrentStep(step);
+    }
+  };
+
+  const saveUserProfile = async (userId: string) => {
+    try {
+      // Mapear dados do formulário para o formato do banco
+      const profileData = {
+        user_id: userId,
+        full_name: formData.name,
+        age: formData.age,
+        gender: formData.gender === 'male' ? 'masculino' : formData.gender === 'female' ? 'feminino' : 'outro',
+        weight: formData.weight,
+        height: formData.height,
+        activity_level: formData.activityLevel === 'sedentary' ? 'sedentario' : 
+                      formData.activityLevel === 'light' ? 'leve' : 
+                      formData.activityLevel === 'moderate' ? 'moderado' : 
+                      formData.activityLevel === 'active' ? 'intenso' : 'muito_intenso',
+        goals: [formData.primaryGoal, ...formData.secondaryGoals],
+        dietary_restrictions: [...formData.allergies, ...formData.intolerances],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      // Salvar perfil principal
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([profileData]);
+
+      if (profileError) {
+        console.error('Erro ao salvar perfil:', profileError);
+        throw profileError;
+      }
+
+      // Salvar dados de treino
+      const workoutData = {
+        user_id: userId,
+        workout_type: formData.workoutType,
+        workout_duration: formData.workoutDuration,
+        workout_days: formData.workoutDays,
+        preferred_time: formData.preferredWorkoutTime,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: workoutError } = await supabase
+        .from('workout_preferences')
+        .insert([workoutData]);
+
+      if (workoutError) {
+        console.error('Erro ao salvar preferências de treino:', workoutError);
+        // Não falhar se não conseguir salvar preferências de treino
+      }
+
+      // Salvar dados de dieta
+      const dietData = {
+        user_id: userId,
+        diet_type: formData.dietType,
+        allergies: formData.allergies,
+        intolerances: formData.intolerances,
+        medications: formData.medications,
+        injuries: formData.injuries,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: dietError } = await supabase
+        .from('dietary_preferences')
+        .insert([dietData]);
+
+      if (dietError) {
+        console.error('Erro ao salvar preferências de dieta:', dietError);
+        // Não falhar se não conseguir salvar preferências de dieta
+      }
+
+      // Salvar configurações de notificação
+      const notificationData = {
+        user_id: userId,
+        meals: formData.notifications.meals,
+        workouts: formData.notifications.workouts,
+        progress: formData.notifications.progress,
+        reminders: formData.notifications.reminders,
+        achievements: formData.notifications.achievements,
+        weekly_reports: formData.notifications.weeklyReports,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: notificationError } = await supabase
+        .from('notification_preferences')
+        .insert([notificationData]);
+
+      if (notificationError) {
+        console.error('Erro ao salvar preferências de notificação:', notificationError);
+        // Não falhar se não conseguir salvar notificações
+      }
+
+      toast({
+        title: "Perfil criado com sucesso!",
+        description: "Todos os seus dados foram salvos e a IA já pode criar planos personalizados.",
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao salvar perfil completo:', error);
+      toast({
+        title: "Erro ao salvar perfil",
+        description: "Alguns dados podem não ter sido salvos. Você pode completar seu perfil depois.",
+        variant: "destructive"
+      });
+      return false;
     }
   };
 

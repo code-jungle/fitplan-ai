@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { CustomButton } from "@/components/ui/custom-button";
 import { Logo } from "@/components/Logo";
@@ -17,50 +17,209 @@ import {
   Plus
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface ProgressData {
+  currentWeight: number;
+  goalWeight: number;
+  startWeight: number;
+  weeklyProgress: Array<{ week: string; weight: number }>;
+  measurements: {
+    chest: number;
+    waist: number;
+    hip: number;
+    arm: number;
+    thigh: number;
+  };
+  weeklyStats: {
+    workoutsCompleted: number;
+    workoutsGoal: number;
+    caloriesAvg: number;
+    caloriesGoal: number;
+    waterAvg: number;
+    waterGoal: number;
+  };
+}
 
 export default function ProgressPage() {
   const { user } = useAuth();
   const [newWeight, setNewWeight] = useState("");
+  const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
-  // Mock data - seria carregado do banco de dados
-  const progressData = {
-    currentWeight: 78.5,
-    goalWeight: 75.0,
-    startWeight: 82.0,
-    weeklyProgress: [
-      { week: "Sem 1", weight: 82.0 },
-      { week: "Sem 2", weight: 81.2 },
-      { week: "Sem 3", weight: 80.5 },
-      { week: "Sem 4", weight: 79.8 },
-      { week: "Sem 5", weight: 79.0 },
-      { week: "Sem 6", weight: 78.5 },
-    ],
-    measurements: {
-      chest: 95,
-      waist: 85,
-      hip: 98,
-      arm: 35,
-      thigh: 58
-    },
-    weeklyStats: {
-      workoutsCompleted: 4,
-      workoutsGoal: 5,
-      caloriesAvg: 1850,
-      caloriesGoal: 1800,
-      waterAvg: 2.1,
-      waterGoal: 2.5
+  useEffect(() => {
+    if (user?.id) {
+      loadProgressData();
+    }
+  }, [user]);
+
+  const loadProgressData = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      
+      // Carregar dados de progresso do banco
+      const { data: progressRecords, error: progressError } = await supabase
+        .from('progress_tracking')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('record_date', { ascending: false })
+        .limit(10);
+
+      if (progressError) {
+        console.error('Erro ao carregar progresso:', progressError);
+        return;
+      }
+
+      // Carregar perfil para obter peso inicial e meta
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('weight, goals')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Erro ao carregar perfil:', profileError);
+      }
+
+      // Processar dados de progresso
+      const currentWeight = progressRecords?.[0]?.weight || profileData?.weight || 70;
+      const startWeight = progressRecords?.[progressRecords.length - 1]?.weight || profileData?.weight || 70;
+      const goalWeight = profileData?.weight ? profileData.weight * 0.9 : startWeight * 0.9; // Meta de 10% de perda
+
+      // Criar progresso semanal
+      const weeklyProgress = progressRecords?.slice(0, 6).map((record, index) => ({
+        week: `Sem ${index + 1}`,
+        weight: record.weight || startWeight
+      })) || [
+        { week: "Sem 1", weight: startWeight },
+        { week: "Sem 2", weight: startWeight * 0.99 },
+        { week: "Sem 3", weight: startWeight * 0.98 },
+        { week: "Sem 4", weight: startWeight * 0.97 },
+        { week: "Sem 5", weight: startWeight * 0.96 },
+        { week: "Sem 6", weight: currentWeight }
+      ];
+
+      // Dados de medições (mockados por enquanto, mas podem ser salvos no banco)
+      const measurements = {
+        chest: 95,
+        waist: 85,
+        hip: 98,
+        arm: 35,
+        thigh: 58
+      };
+
+      // Estatísticas semanais (mockadas por enquanto)
+      const weeklyStats = {
+        workoutsCompleted: 4,
+        workoutsGoal: 5,
+        caloriesAvg: 1850,
+        caloriesGoal: 1800,
+        waterAvg: 2.1,
+        waterGoal: 2.5
+      };
+
+      setProgressData({
+        currentWeight,
+        goalWeight,
+        startWeight,
+        weeklyProgress,
+        measurements,
+        weeklyStats
+      });
+    } catch (error) {
+      console.error('Erro ao carregar dados de progresso:', error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleAddWeight = async () => {
+    if (!newWeight || !user?.id || !progressData) return;
+
+    try {
+      const weight = parseFloat(newWeight);
+      if (isNaN(weight) || weight <= 0) {
+        toast({
+          title: "Peso inválido",
+          description: "Digite um peso válido maior que zero.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Salvar novo peso no banco
+      const { error } = await supabase
+        .from('progress_tracking')
+        .insert([{
+          user_id: user.id,
+          record_date: new Date().toISOString().split('T')[0],
+          weight: weight,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }]);
+
+      if (error) {
+        throw error;
+      }
+
+      // Atualizar dados locais
+      setProgressData(prev => prev ? {
+        ...prev,
+        currentWeight: weight,
+        weeklyProgress: [
+          ...prev.weeklyProgress.slice(1),
+          { week: `Sem ${prev.weeklyProgress.length + 1}`, weight }
+        ]
+      } : null);
+
+      setNewWeight("");
+      toast({
+        title: "Peso registrado!",
+        description: "Seu novo peso foi salvo com sucesso.",
+      });
+
+      // Recarregar dados
+      await loadProgressData();
+    } catch (error) {
+      console.error('Erro ao salvar peso:', error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar o peso. Tente novamente.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-secondary">
+        <div className="container mx-auto p-4">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-4 text-muted-foreground">Carregando progresso...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!progressData) {
+    return (
+      <div className="min-h-screen bg-gradient-secondary">
+        <div className="container mx-auto p-4">
+          <div className="text-center">
+            <p className="text-muted-foreground">Nenhum dado de progresso encontrado.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const progressPercentage = ((progressData.startWeight - progressData.currentWeight) / (progressData.startWeight - progressData.goalWeight)) * 100;
-
-  const handleAddWeight = () => {
-    if (newWeight) {
-      // Aqui salvaria no banco
-      console.log("Adding weight:", newWeight);
-      setNewWeight("");
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-secondary">

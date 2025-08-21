@@ -14,7 +14,155 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string | null
+          age: number | null
+          weight: number | null
+          height: number | null
+          gender: string | null
+          activity_level: string | null
+          goals: string[] | null
+          dietary_restrictions: string[] | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name?: string | null
+          age?: number | null
+          weight?: number | null
+          height?: number | null
+          gender?: string | null
+          activity_level?: string | null
+          goals?: string[] | null
+          dietary_restrictions?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string | null
+          age?: number | null
+          weight?: number | null
+          height?: number | null
+          gender?: string | null
+          activity_level?: string | null
+          goals?: string[] | null
+          dietary_restrictions?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      workout_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          workout_type: string | null
+          workout_duration: string | null
+          workout_days: number | null
+          preferred_time: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          workout_type?: string | null
+          workout_duration?: string | null
+          workout_days?: number | null
+          preferred_time?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          workout_type?: string | null
+          workout_duration?: string | null
+          workout_days?: number | null
+          preferred_time?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      dietary_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          diet_type: string | null
+          allergies: string[] | null
+          intolerances: string[] | null
+          medications: string[] | null
+          injuries: string[] | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          diet_type?: string | null
+          allergies?: string[] | null
+          intolerances?: string[] | null
+          medications?: string[] | null
+          injuries?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          diet_type?: string | null
+          allergies?: string[] | null
+          intolerances?: string[] | null
+          medications?: string[] | null
+          injuries?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      notification_preferences: {
+        Row: {
+          id: string
+          user_id: string
+          meals: boolean | null
+          workouts: boolean | null
+          progress: boolean | null
+          reminders: boolean | null
+          achievements: boolean | null
+          weekly_reports: boolean | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          meals?: boolean | null
+          workouts?: boolean | null
+          progress?: boolean | null
+          reminders?: boolean | null
+          achievements?: boolean | null
+          weekly_reports?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          meals?: boolean | null
+          workouts?: boolean | null
+          progress?: boolean | null
+          reminders?: boolean | null
+          achievements?: boolean | null
+          weekly_reports?: boolean | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -35,104 +183,69 @@ export type Database = {
 }
 
 type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
 export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
+  PublicTableNameOrOptions extends
+    | keyof (DatabaseWithoutInternals["public"]["Tables"])
+    | { schema: keyof DatabaseWithoutInternals["public"]["Tables"] },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+    ? keyof (DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]]
+  : PublicTableNameOrOptions extends keyof DatabaseWithoutInternals["public"]["Tables"]
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions]
+  : never
 
 export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
+  PublicTableNameOrOptions extends
+    | keyof (DatabaseWithoutInternals["public"]["Tables"])
+    | { schema: keyof DatabaseWithoutInternals["public"]["Tables"] },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+    ? keyof (DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]]["Insert"]
+  : PublicTableNameOrOptions extends keyof DatabaseWithoutInternals["public"]["Tables"]
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions]["Insert"]
+  : never
+
+export type TablesRow<
+  PublicTableNameOrOptions extends
+    | keyof (DatabaseWithoutInternals["public"]["Tables"])
+    | { schema: keyof DatabaseWithoutInternals["public"]["Tables"] },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+    ? keyof (DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]]["Row"]
+  : PublicTableNameOrOptions extends keyof DatabaseWithoutInternals["public"]["Tables"]
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions]["Row"]
+  : never
 
 export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
+  PublicTableNameOrOptions extends
+    | keyof (DatabaseWithoutInternals["public"]["Tables"])
+    | { schema: keyof DatabaseWithoutInternals["public"]["Tables"] },
+  TableName extends PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+    ? keyof (DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]])
+    : never = never
+> = PublicTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Tables"] }
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions["schema"]]["Update"]
+  : PublicTableNameOrOptions extends keyof DatabaseWithoutInternals["public"]["Tables"]
+  ? DatabaseWithoutInternals["public"]["Tables"][PublicTableNameOrOptions]["Update"]
+  : never
 
 export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
+  PublicEnumNameOrOptions extends
+    | keyof (DatabaseWithoutInternals["public"]["Enums"])
+    | { schema: keyof DatabaseWithoutInternals["public"]["Enums"] },
+  EnumName extends PublicEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Enums"] }
+    ? keyof (DatabaseWithoutInternals["public"]["Enums"][PublicEnumNameOrOptions["schema"]])
+    : never = never
+> = PublicEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Enums"] }
+  ? DatabaseWithoutInternals["public"]["Enums"][PublicEnumNameOrOptions["schema"]]
+  : PublicEnumNameOrOptions extends keyof DatabaseWithoutInternals["public"]["Enums"]
+  : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends

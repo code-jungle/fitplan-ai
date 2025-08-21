@@ -89,46 +89,51 @@ serve(async (req) => {
       });
     }
 
-    // Buscar perfil do usuário
-    const { data: profile } = await supabaseClient
+    // Carregar perfil completo do usuário do banco
+    const { data: profileData, error: profileError } = await supabaseClient
       .from('profiles')
       .select('*')
       .eq('user_id', user.id)
       .single();
 
-    // Verificar se o usuário tem acesso (trial ou assinatura ativa)
-    const { data: subscription } = await supabaseClient
-      .from('subscribers')
+    if (profileError) {
+      console.error('Erro ao carregar perfil:', profileError);
+      return new Response(JSON.stringify({ 
+        error: 'Erro ao carregar perfil do usuário' 
+      }), {
+        status: 500,
+        headers: { ...headers, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Carregar preferências de dieta
+    const { data: dietData, error: dietError } = await supabaseClient
+      .from('dietary_preferences')
       .select('*')
       .eq('user_id', user.id)
       .single();
 
-    const hasAccess = subscription && (
-      subscription.subscribed || 
-      (subscription.trial_ends_at && new Date(subscription.trial_ends_at) > new Date())
-    );
-
-    if (!hasAccess) {
-          return new Response(JSON.stringify({ 
-      error: 'Acesso negado. Assinatura necessária.' 
-    }), {
-      status: 403,
-      headers: { ...headers, 'Content-Type': 'application/json' }
-    });
+    if (dietError && dietError.code !== 'PGRST116') {
+      console.error('Erro ao carregar preferências de dieta:', dietError);
     }
 
-    // Gerar prompt para a IA Gemini baseado no perfil
+    // Gerar prompt para a IA Gemini baseado no perfil real
     const prompt = `
 Crie um plano alimentar personalizado para hoje baseado nas seguintes informações:
 
 Perfil do usuário:
-- Idade: ${profile?.age || 'não informado'} anos
-- Peso: ${profile?.weight || 'não informado'} kg
-- Altura: ${profile?.height || 'não informado'} m
-- Gênero: ${profile?.gender || 'não informado'}
-- Nível de atividade: ${profile?.activity_level || 'moderado'}
-- Objetivos: ${profile?.goals?.join(', ') || 'manter peso'}
-- Restrições alimentares: ${profile?.dietary_restrictions?.join(', ') || 'nenhuma'}
+- Nome: ${profileData?.full_name || 'não informado'}
+- Idade: ${profileData?.age || 'não informado'} anos
+- Peso: ${profileData?.weight || 'não informado'} kg
+- Altura: ${profileData?.height || 'não informado'} cm
+- Gênero: ${profileData?.gender || 'não informado'}
+- Nível de atividade: ${profileData?.activity_level || 'moderado'}
+- Objetivos: ${profileData?.goals?.join(', ') || 'manter peso'}
+- Tipo de dieta: ${dietData?.diet_type || 'equilibrada'}
+- Restrições alimentares: ${dietData?.allergies?.join(', ') || 'nenhuma'}
+- Intolerâncias: ${dietData?.intolerances?.join(', ') || 'nenhuma'}
+- Medicamentos: ${dietData?.medications?.join(', ') || 'nenhum'}
+- Lesões/Problemas: ${dietData?.injuries?.join(', ') || 'nenhum'}
 
 Preciso que você retorne APENAS um JSON válido no seguinte formato:
 {
@@ -156,6 +161,7 @@ Preciso que você retorne APENAS um JSON válido no seguinte formato:
 }
 
 Inclua pelo menos café da manhã, almoço, lanche e jantar. Use alimentos brasileiros típicos.
+Considere as restrições e preferências do usuário para criar um plano seguro e personalizado.
 `;
 
     // Chamar API do Gemini
