@@ -885,7 +885,7 @@ export default function Auth() {
             <div className="mb-6 sm:mb-8">
               {/* Mobile Progress Steps */}
               <div className="block sm:hidden mb-4">
-                <div className="flex items-center justify-center gap-2 mb-3">
+                <div className="flex items-center justify-center gap-1 mb-3">
                   {STEPS.map((step, index) => (
                     <div key={step.id} className="flex items-center">
                       <div 
@@ -905,7 +905,7 @@ export default function Auth() {
                         )}
                       </div>
                       {index < STEPS.length - 1 && (
-                        <div className={`w-8 h-0.5 mx-1 ${
+                        <div className={`w-6 h-0.5 mx-0.5 ${
                           step.id < currentStep ? 'bg-primary' : 'bg-border'
                         }`} />
                       )}
@@ -941,7 +941,7 @@ export default function Auth() {
                         )}
                       </div>
                       {index < STEPS.length - 1 && (
-                        <div className={`w-16 h-0.5 mx-2 ${
+                        <div className={`w-12 h-0.5 mx-1 ${
                           step.id < currentStep ? 'bg-primary' : 'bg-border'
                         }`} />
                       )}
