@@ -14,7 +14,8 @@ import {
   TrendingUp,
   User,
   Zap,
-  LogOut
+  LogOut,
+  CreditCard
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -33,8 +34,9 @@ export default function Dashboard() {
       {/* Header */}
       <header className="glass-card border-b border-border/30 p-4">
         <div className="container mx-auto flex items-center justify-between">
-          <Logo />
-          <div className="flex items-center gap-4">
+          <Logo size="sm" />
+          {/* Desktop */}
+          <div className="hidden sm:flex items-center gap-4">
             <Link to="/profile">
               <CustomButton variant="glass" size="sm">
                 <User className="w-4 h-4" />
@@ -54,6 +56,33 @@ export default function Dashboard() {
             <CustomButton variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4" />
               Sair
+            </CustomButton>
+          </div>
+          {/* Mobile */}
+          <div className="flex sm:hidden items-center gap-2">
+            <Link to="/profile" title="Perfil">
+              <CustomButton variant="glass" size="icon" aria-label="Perfil">
+                <User className="w-5 h-5" />
+              </CustomButton>
+            </Link>
+            <Link to="/subscription" title="Assinatura">
+              <CustomButton variant="outline" size="icon" aria-label="Assinatura">
+                <CreditCard className="w-5 h-5" />
+              </CustomButton>
+            </Link>
+            <Link to="/progress" title="Progresso">
+              <CustomButton variant="outline" size="icon" aria-label="Progresso">
+                <TrendingUp className="w-5 h-5" />
+              </CustomButton>
+            </Link>
+            <CustomButton
+              variant="ghost"
+              size="icon"
+              aria-label="Sair"
+              onClick={handleSignOut}
+              title="Sair"
+            >
+              <LogOut className="w-5 h-5" />
             </CustomButton>
           </div>
         </div>

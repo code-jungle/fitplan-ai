@@ -1,0 +1,68 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient-bg)" stroke="url(#gradient-stroke)" stroke-width="8"/>
+  
+  <!-- Dumbbell Icon -->
+  <g transform="translate(156, 186)">
+    <!-- Left Weight -->
+    <rect x="0" y="80" width="24" height="60" rx="12" fill="url(#gradient-primary)"/>
+    <!-- Right Weight -->
+    <rect x="332" y="80" width="24" height="60" rx="12" fill="url(#gradient-primary)"/>
+    <!-- Bar -->
+    <rect x="24" y="95" width="308" height="30" rx="15" fill="url(#gradient-secondary)"/>
+    <!-- Center Grip -->
+    <rect x="146" y="85" width="64" height="50" rx="25" fill="url(#gradient-accent)" stroke="url(#gradient-stroke)" stroke-width="4"/>
+  </g>
+  
+  <!-- AI Brain Icon -->
+  <g transform="translate(206, 306)">
+    <!-- Brain Outline -->
+    <path d="M50 20 C50 10, 40 0, 30 0 C20 0, 10 10, 10 20 C10 30, 20 40, 30 40 C40 40, 50 30, 50 20 Z" fill="url(#gradient-brain)" opacity="0.8"/>
+    <!-- Neural Connections -->
+    <circle cx="15" cy="15" r="3" fill="url(#gradient-accent)"/>
+    <circle cx="35" cy="15" r="3" fill="url(#gradient-accent)"/>
+    <circle cx="25" cy="25" r="3" fill="url(#gradient-accent)"/>
+    <!-- Connection Lines -->
+    <path d="M15 15 L25 25" stroke="url(#gradient-accent)" stroke-width="2" opacity="0.6"/>
+    <path d="M25 25 L35 15" stroke="url(#gradient-accent)" stroke-width="2" opacity="0.6"/>
+  </g>
+  
+  <!-- Gradients -->
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="gradient-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e1b4b;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Stroke Gradient -->
+    <linearGradient id="gradient-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Primary Gradient -->
+    <linearGradient id="gradient-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4f46e5;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Secondary Gradient -->
+    <linearGradient id="gradient-secondary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Accent Gradient -->
+    <linearGradient id="gradient-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Brain Gradient -->
+    <linearGradient id="gradient-brain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

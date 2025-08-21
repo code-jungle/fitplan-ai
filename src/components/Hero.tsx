@@ -13,16 +13,11 @@ export function Hero() {
           <div className="flex items-center gap-4">
             <Link 
               to="/auth" 
-              className="px-4 py-2 text-foreground hover:text-primary border border-border/30 hover:border-primary/50 rounded-lg transition-all duration-300 hover:bg-primary/10"
+              className="px-6 py-3 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold rounded-lg transition-all duration-300 hover:from-primary/90 hover:to-primary/70 hover:shadow-lg hover:shadow-primary/25 transform hover:scale-105 border-0"
             >
               Entrar
             </Link>
-            <Link 
-              to="/auth?mode=signup" 
-              className="px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-            >
-              Começar Agora
-            </Link>
+            
             
           </div>
         </div>
