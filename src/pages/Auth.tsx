@@ -1216,6 +1216,15 @@ export default function Auth() {
             <p className="text-xs sm:text-sm text-muted-foreground mt-2">
               📧 Após o cadastro, verifique seu email para confirmar sua conta
             </p>
+            {/* Botão de teste temporário */}
+            <CustomButton 
+              onClick={() => setShowConfirmationModal(true)}
+              variant="outline"
+              size="sm"
+              className="mt-3"
+            >
+              🧪 Testar Modal
+            </CustomButton>
           </div>
         )}
       </div>
