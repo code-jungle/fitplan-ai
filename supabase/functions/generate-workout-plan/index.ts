@@ -97,7 +97,7 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    if (profileError) {
+    if (profileError || !profileData) {
       console.error('Erro ao carregar perfil:', profileError);
       return new Response(JSON.stringify({ 
         error: 'Erro ao carregar perfil do usuário' 
@@ -153,6 +153,11 @@ serve(async (req) => {
 });
 
 function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, dietPreferences: any) {
+  // Validar se profile existe e tem dados necessários
+  if (!profile || !profile.weight || !profile.height || !profile.age || !profile.gender) {
+    throw new Error('Dados do perfil incompletos ou inválidos');
+  }
+
   // Dados do usuário para personalização
   const { full_name, age, weight, height, gender, activity_level, goals } = profile;
   const { workout_type, workout_duration, workout_days, preferred_time } = workoutPreferences || {};
@@ -162,7 +167,7 @@ function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, 
   const intensity = determineWorkoutIntensity(activity_level, goals?.[0]);
   
   // Gerar treinos baseados no tipo e intensidade
-  const workouts = generateWorkouts(workout_type, intensity, injuries);
+  const workouts = generateWorkouts(workout_type, intensity, injuries || []);
   
   // Calcular duração baseada nas preferências
   const duration = workout_duration || '60min';
@@ -170,13 +175,13 @@ function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, 
   
   return {
     userInfo: {
-      name: full_name,
+      name: full_name || 'Usuário',
       age,
       weight,
       height,
       gender,
       activityLevel: activity_level,
-      goals
+      goals: goals || []
     },
     workoutPreferences: {
       type: workout_type || 'mixed',
@@ -187,8 +192,8 @@ function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, 
     intensity,
     workouts,
     schedule: generateWorkoutSchedule(days, preferred_time),
-    recommendations: generateWorkoutRecommendations(workout_type, goals?.[0], injuries),
-    safetyNotes: generateSafetyNotes(injuries, age, activity_level)
+    recommendations: generateWorkoutRecommendations(workout_type, goals?.[0], injuries || []),
+    safetyNotes: generateSafetyNotes(injuries || [], age, activity_level)
   };
 }
 
@@ -383,6 +388,19 @@ function generateWorkoutSchedule(days: number, preferredTime: string) {
 }
 
 function generateWorkoutRecommendations(workoutType: string, goal: string, injuries: string[]) {
+  // Validar parâmetros de entrada
+  if (!workoutType || !goal) {
+    return [
+      "Sempre faça aquecimento antes do treino",
+      "Mantenha a técnica correta em todos os exercícios",
+      "Hidrate-se adequadamente durante o treino",
+      "Descanse adequadamente entre as sessões"
+    ];
+  }
+
+  // Garantir que injuries é um array
+  const safeInjuries = Array.isArray(injuries) ? injuries : [];
+
   const recommendations = {
     general: [
       "Sempre faça aquecimento antes do treino",
@@ -448,22 +466,25 @@ function generateWorkoutRecommendations(workoutType: string, goal: string, injur
 
   let selectedRecommendations = [...recommendations.general];
   
-  if (workoutType && recommendations[workoutType]) {
-    selectedRecommendations.push(...recommendations[workoutType]);
+  if (workoutType && recommendations[workoutType as keyof typeof recommendations]) {
+    selectedRecommendations.push(...recommendations[workoutType as keyof typeof recommendations]);
   }
   
-  if (goal && recommendations[goal]) {
-    selectedRecommendations.push(...recommendations[goal]);
+  if (goal && recommendations[goal as keyof typeof recommendations]) {
+    selectedRecommendations.push(...recommendations[goal as keyof typeof recommendations]);
   }
   
   return selectedRecommendations;
 }
 
 function generateSafetyNotes(injuries: string[], age: number, activityLevel: string) {
-  const notes = [];
+  // Garantir que injuries é um array
+  const safeInjuries = Array.isArray(injuries) ? injuries : [];
   
-  if (injuries && injuries.length > 0) {
-    notes.push(`⚠️ ATENÇÃO: Evite exercícios que possam agravar: ${injuries.join(', ')}`);
+  const notes: string[] = [];
+  
+  if (safeInjuries.length > 0) {
+    notes.push(`⚠️ ATENÇÃO: Evite exercícios que possam agravar: ${safeInjuries.join(', ')}`);
   }
   
   if (age > 50) {
