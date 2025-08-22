@@ -97,7 +97,7 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    if (profileError) {
+    if (profileError || !profileData) {
       console.error('Erro ao carregar perfil:', profileError);
       return new Response(JSON.stringify({ 
         error: 'Erro ao carregar perfil do usuário' 
@@ -142,6 +142,11 @@ serve(async (req) => {
 });
 
 function generatePersonalizedMealPlan(profile: any, dietPreferences: any) {
+  // Validar se profile existe e tem dados necessários
+  if (!profile || !profile.weight || !profile.height || !profile.age || !profile.gender) {
+    throw new Error('Dados do perfil incompletos ou inválidos');
+  }
+
   // Dados do usuário para personalização
   const { full_name, age, weight, height, gender, activity_level, goals } = profile;
   const { diet_type, allergies, intolerances, medications } = dietPreferences || {};
@@ -152,17 +157,17 @@ function generatePersonalizedMealPlan(profile: any, dietPreferences: any) {
   const targetCalories = adjustCaloriesForGoal(tdee, goals?.[0]);
   
   // Gerar refeições baseadas no tipo de dieta e restrições
-  const meals = generateMeals(diet_type, targetCalories, allergies, intolerances);
+  const meals = generateMeals(diet_type, targetCalories, allergies || [], intolerances || []);
   
   return {
     userInfo: {
-      name: full_name,
+      name: full_name || 'Usuário',
       age,
       weight,
       height,
       gender,
       activityLevel: activity_level,
-      goals
+      goals: goals || []
     },
     nutritionTargets: {
       dailyCalories: targetCalories,
@@ -252,6 +257,15 @@ function generateMeals(dietType: string, dailyCalories: number, allergies: strin
 }
 
 function generateFoodList(dietType: string, mealType: string, allergies: string[], intolerances: string[]) {
+  // Validar parâmetros de entrada
+  if (!dietType || !mealType) {
+    return ["Alimento padrão"];
+  }
+
+  // Garantir que allergies e intolerances são arrays
+  const safeAllergies = Array.isArray(allergies) ? allergies : [];
+  const safeIntolerances = Array.isArray(intolerances) ? intolerances : [];
+
   // Lista de alimentos baseada no tipo de dieta e refeição
   const foodDatabase = {
     balanced: {
@@ -276,12 +290,16 @@ function generateFoodList(dietType: string, mealType: string, allergies: string[
 
   const foods = foodDatabase[dietType]?.[mealType] || foodDatabase.balanced[mealType];
   
+  if (!foods || !Array.isArray(foods)) {
+    return ["Alimento padrão"];
+  }
+  
   // Filtrar alimentos baseado em alergias e intolerâncias
   const safeFoods = foods.filter(food => 
-    !allergies.some(allergy => 
+    !safeAllergies.some(allergy => 
       food.toLowerCase().includes(allergy.toLowerCase())
     ) &&
-    !intolerances.some(intolerance => 
+    !safeIntolerances.some(intolerance => 
       food.toLowerCase().includes(intolerance.toLowerCase())
     )
   );
@@ -291,6 +309,16 @@ function generateFoodList(dietType: string, mealType: string, allergies: string[
 }
 
 function generateDietRecommendations(dietType: string, goal: string) {
+  // Validar parâmetros de entrada
+  if (!dietType || !goal) {
+    return [
+      "Beba pelo menos 2L de água por dia",
+      "Faça 5-6 refeições pequenas ao longo do dia",
+      "Mastigue bem os alimentos",
+      "Evite comer muito próximo ao horário de dormir"
+    ];
+  }
+
   const recommendations = {
     general: [
       "Beba pelo menos 2L de água por dia",
@@ -344,12 +372,12 @@ function generateDietRecommendations(dietType: string, goal: string) {
 
   let selectedRecommendations = [...recommendations.general];
   
-  if (dietType && recommendations[dietType]) {
-    selectedRecommendations.push(...recommendations[dietType]);
+  if (dietType && recommendations[dietType as keyof typeof recommendations]) {
+    selectedRecommendations.push(...recommendations[dietType as keyof typeof recommendations]);
   }
   
-  if (goal && recommendations[goal]) {
-    selectedRecommendations.push(...recommendations[goal]);
+  if (goal && recommendations[goal as keyof typeof recommendations]) {
+    selectedRecommendations.push(...recommendations[goal as keyof typeof recommendations]);
   }
   
   return selectedRecommendations;
