@@ -26,7 +26,9 @@ import {
   X,
   CheckCircle,
   Circle,
-  CheckCircle2
+  CheckCircle2,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -90,6 +92,9 @@ const STEPS = [
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [formData, setFormData] = useState<SignUpData>({
     name: '',
     email: '',
@@ -432,9 +437,9 @@ export default function Auth() {
                 <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className={`pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base ${
+                  className={`pl-10 pr-12 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base ${
                     passwordError && formData.password !== formData.confirmPassword 
                       ? 'border-destructive' 
                       : ''
@@ -449,6 +454,18 @@ export default function Auth() {
                   }}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-muted rounded-md transition-colors"
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  ) : (
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -458,9 +475,9 @@ export default function Auth() {
                 <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className={`pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base ${
+                  className={`pl-10 pr-12 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base ${
                     passwordError && formData.password !== formData.confirmPassword 
                       ? 'border-destructive' 
                       : ''
@@ -475,6 +492,18 @@ export default function Auth() {
                   }}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-muted rounded-md transition-colors"
+                  aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  ) : (
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  )}
+                </button>
               </div>
               {passwordError && (
                 <p className="text-sm text-destructive mt-1 flex items-center gap-2">
@@ -1143,13 +1172,25 @@ export default function Auth() {
                     <Lock className="absolute left-3 top-3 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <Input 
                   id="password"
-                  type="password"
+                  type={showLoginPassword ? "text" : "password"}
                   placeholder="••••••••"
-                      className="pl-10 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
+                      className="pl-10 pr-12 bg-input/50 border-border/50 h-10 sm:h-11 text-sm sm:text-base"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-muted rounded-md transition-colors"
+                  aria-label={showLoginPassword ? "Ocultar senha" : "Mostrar senha"}
+                >
+                  {showLoginPassword ? (
+                    <EyeOff className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  ) : (
+                    <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
+                  )}
+                </button>
               </div>
             </div>
               </>
