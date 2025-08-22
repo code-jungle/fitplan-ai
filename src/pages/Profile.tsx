@@ -129,7 +129,7 @@ export default function Profile() {
       // Combinar todos os dados
       const combinedProfile: UserProfile = {
         personalInfo: {
-          name: profileData?.full_name || user?.user_metadata?.full_name || 'Usuário',
+          name: profileData?.name || profileData?.full_name || user?.user_metadata?.full_name || 'Usuário', // Adicionando fallback para name
           email: user?.email || '',
           age: profileData?.age || 0,
           gender: profileData?.gender === 'masculino' ? 'male' : 

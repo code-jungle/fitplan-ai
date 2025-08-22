@@ -314,12 +314,16 @@ export default function Dashboard() {
       <div className="container mx-auto p-4 sm:p-6 lg:p-8">
         {/* Welcome Message */}
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-orbitron font-bold text-foreground mb-2">
-            Olá, <span className="text-primary">{userName.toUpperCase()}</span>! 👋
-          </h1>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Vamos continuar sua jornada de transformação hoje
-          </p>
+          <div className="flex items-center gap-4">
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                Olá, {dashboardData?.profile?.name || dashboardData?.profile?.full_name || user?.user_metadata?.full_name || 'Usuário'}! 👋
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                Vamos continuar sua jornada de transformação hoje
+              </p>
+            </div>
+          </div>
         </div>
 
         {loading ? (

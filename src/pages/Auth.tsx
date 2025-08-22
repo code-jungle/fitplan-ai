@@ -261,7 +261,7 @@ export default function Auth() {
       // Mapear dados do formulário para o formato do banco
       const profileData = {
         user_id: userId,
-        full_name: formData.name,
+        name: formData.name, // Mudando de full_name para name
         age: formData.age,
         gender: formData.gender === 'male' ? 'masculino' : formData.gender === 'female' ? 'feminino' : 'outro',
         weight: formData.weight,
