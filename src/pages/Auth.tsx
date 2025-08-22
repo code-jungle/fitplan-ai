@@ -255,6 +255,9 @@ export default function Auth() {
 
   const saveUserProfile = async (userId: string) => {
     try {
+      console.log('🔍 Iniciando saveUserProfile para userId:', userId);
+      console.log('📝 Dados do formulário:', formData);
+      
       // Mapear dados do formulário para o formato do banco
       const profileData = {
         user_id: userId,
@@ -273,15 +276,20 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
+      console.log('💾 Dados do perfil a serem salvos:', profileData);
+
       // Salvar perfil principal
-      const { error: profileError } = await supabase
+      const { data: profileResult, error: profileError } = await supabase
         .from('profiles')
-        .insert([profileData]);
+        .insert([profileData])
+        .select();
 
       if (profileError) {
-        console.error('Erro ao salvar perfil:', profileError);
+        console.error('❌ Erro ao salvar perfil:', profileError);
         throw profileError;
       }
+
+      console.log('✅ Perfil salvo com sucesso:', profileResult);
 
       // Salvar dados de treino
       const workoutData = {
@@ -294,13 +302,18 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      const { error: workoutError } = await supabase
+      console.log('💪 Dados de treino a serem salvos:', workoutData);
+
+      const { data: workoutResult, error: workoutError } = await supabase
         .from('workout_preferences')
-        .insert([workoutData]);
+        .insert([workoutData])
+        .select();
 
       if (workoutError) {
-        console.error('Erro ao salvar preferências de treino:', workoutError);
+        console.error('❌ Erro ao salvar preferências de treino:', workoutError);
         // Não falhar se não conseguir salvar preferências de treino
+      } else {
+        console.log('✅ Preferências de treino salvas com sucesso:', workoutResult);
       }
 
       // Salvar dados de dieta
@@ -315,13 +328,18 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      const { error: dietError } = await supabase
+      console.log('🍽️ Dados de dieta a serem salvos:', dietData);
+
+      const { data: dietResult, error: dietError } = await supabase
         .from('dietary_preferences')
-        .insert([dietData]);
+        .insert([dietData])
+        .select();
 
       if (dietError) {
-        console.error('Erro ao salvar preferências de dieta:', dietError);
+        console.error('❌ Erro ao salvar preferências de dieta:', dietError);
         // Não falhar se não conseguir salvar preferências de dieta
+      } else {
+        console.log('✅ Preferências de dieta salvas com sucesso:', dietResult);
       }
 
       // Salvar configurações de notificação
@@ -337,14 +355,21 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      const { error: notificationError } = await supabase
+      console.log('🔔 Dados de notificação a serem salvos:', notificationData);
+
+      const { data: notificationResult, error: notificationError } = await supabase
         .from('notification_preferences')
-        .insert([notificationData]);
+        .insert([notificationData])
+        .select();
 
       if (notificationError) {
-        console.error('Erro ao salvar preferências de notificação:', notificationError);
+        console.error('❌ Erro ao salvar preferências de notificação:', notificationError);
         // Não falhar se não conseguir salvar notificações
+      } else {
+        console.log('✅ Preferências de notificação salvas com sucesso:', notificationResult);
       }
+
+      console.log('🎉 Todos os dados foram salvos com sucesso!');
 
       toast({
         title: "Perfil criado com sucesso!",
@@ -353,7 +378,7 @@ export default function Auth() {
 
       return true;
     } catch (error) {
-      console.error('Erro ao salvar perfil:', error);
+      console.error('💥 Erro geral ao salvar perfil:', error);
       toast({
         title: "Erro ao salvar perfil",
         description: "Alguns dados podem não ter sido salvos. Complete seu perfil depois.",

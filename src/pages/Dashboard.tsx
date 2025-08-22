@@ -45,46 +45,74 @@ export default function Dashboard() {
 
     try {
       setLoading(true);
+      console.log('🔍 Iniciando loadDashboardData para userId:', user.id);
       
       // Carregar dados do perfil
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .single();
 
+      if (profileError) {
+        console.error('❌ Erro ao carregar perfil:', profileError);
+      } else {
+        console.log('✅ Perfil carregado:', profileData);
+      }
+
       // Carregar dados de progresso
-      const { data: progressData } = await supabase
+      const { data: progressData, error: progressError } = await supabase
         .from('progress_tracking')
         .select('*')
         .eq('user_id', user.id)
         .order('record_date', { ascending: false })
         .limit(1);
 
+      if (progressError) {
+        console.error('❌ Erro ao carregar progresso:', progressError);
+      } else {
+        console.log('✅ Progresso carregado:', progressData);
+      }
+
       // Carregar planos de hoje
       const today = new Date().toISOString().split('T')[0];
-      const { data: mealPlan } = await supabase
+      const { data: mealPlan, error: mealError } = await supabase
         .from('meal_plans')
         .select('*')
         .eq('user_id', user.id)
         .eq('plan_date', today)
         .single();
 
-      const { data: workoutPlan } = await supabase
+      if (mealError && mealError.code !== 'PGRST116') {
+        console.error('❌ Erro ao carregar plano alimentar:', mealError);
+      } else {
+        console.log('✅ Plano alimentar carregado:', mealPlan);
+      }
+
+      const { data: workoutPlan, error: workoutError } = await supabase
         .from('workout_plans')
         .select('*')
         .eq('user_id', user.id)
         .eq('plan_date', today)
         .single();
 
-      setDashboardData({
+      if (workoutError && workoutError.code !== 'PGRST116') {
+        console.error('❌ Erro ao carregar plano de treino:', workoutError);
+      } else {
+        console.log('✅ Plano de treino carregado:', workoutPlan);
+      }
+
+      const dashboardDataToSet = {
         profile: profileData,
         progress: progressData?.[0],
         mealPlan,
         workoutPlan
-      });
+      };
+
+      console.log('📊 Dashboard data a ser definida:', dashboardDataToSet);
+      setDashboardData(dashboardDataToSet);
     } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error);
+      console.error('💥 Erro geral ao carregar dados do dashboard:', error);
     } finally {
       setLoading(false);
     }
