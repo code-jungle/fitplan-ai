@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { 
   Mail, 
@@ -24,7 +25,8 @@ import {
   Plus,
   X,
   CheckCircle,
-  Circle
+  Circle,
+  CheckCircle2
 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -127,6 +129,7 @@ export default function Auth() {
   const [tempIntolerances, setTempIntolerances] = useState('');
   const [tempMedications, setTempMedications] = useState('');
   const [tempInjuries, setTempInjuries] = useState('');
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -199,17 +202,8 @@ export default function Auth() {
           // Salvar perfil completo no banco de dados
           const profileSaved = await saveUserProfile(data.user.id);
           if (profileSaved) {
-            // Mostrar mensagem de sucesso com instruções de verificação
-            toast({
-              title: "🎉 Conta criada com sucesso!",
-              description: "Verifique seu email para confirmar sua conta antes de acessar a aplicação.",
-              duration: 8000,
-            });
-            
-            // Aguardar um pouco para o usuário ler a mensagem
-            setTimeout(() => {
-              navigate('/dashboard');
-            }, 3000);
+            // Mostrar modal de confirmação de email
+            setShowConfirmationModal(true);
           } else {
             // Se não conseguir salvar o perfil, ainda permite navegar mas mostra aviso
             toast({
@@ -1225,6 +1219,83 @@ export default function Auth() {
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10 mb-4">
+              <CheckCircle2 className="h-8 w-8 text-success" />
+            </div>
+            <DialogTitle className="text-xl font-semibold text-foreground">
+              🎉 Conta Criada com Sucesso!
+            </DialogTitle>
+            <DialogDescription className="text-base text-muted-foreground mt-2">
+              Sua conta foi criada e está aguardando confirmação por email.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Mail className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <div className="space-y-2">
+                  <h4 className="font-medium text-primary-foreground text-sm">
+                    Próximos Passos:
+                  </h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      Verifique sua caixa de entrada
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      Clique no link de confirmação
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      Acesse sua conta completa
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-warning/5 border border-warning/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Shield className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-medium text-warning-foreground text-sm mb-1">
+                    Importante:
+                  </h4>
+                  <p className="text-sm text-warning-foreground">
+                    Sem a confirmação do email, você não conseguirá acessar todos os recursos da aplicação.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <CustomButton 
+                onClick={() => setShowConfirmationModal(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Entendi
+              </CustomButton>
+              <CustomButton 
+                onClick={() => {
+                  setShowConfirmationModal(false);
+                  navigate('/dashboard');
+                }}
+                className="flex-1"
+              >
+                Ir para Dashboard
+              </CustomButton>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
