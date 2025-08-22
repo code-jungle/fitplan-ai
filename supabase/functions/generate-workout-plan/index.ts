@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Security: Restrict CORS to specific origins
 const allowedOrigins = [
@@ -26,8 +26,8 @@ serve(async (req) => {
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_URL') || '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
       { auth: { persistSession: false } }
     );
 
@@ -152,7 +152,28 @@ serve(async (req) => {
   }
 });
 
-function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, dietPreferences: any) {
+interface Profile {
+  full_name?: string;
+  age: number;
+  weight: number;
+  height: number;
+  gender: string;
+  activity_level: string;
+  goals?: string[];
+}
+
+interface WorkoutPreferences {
+  workout_type?: string;
+  workout_duration?: string;
+  workout_days?: number;
+  preferred_time?: string;
+}
+
+interface DietPreferences {
+  injuries?: string[];
+}
+
+function generatePersonalizedWorkoutPlan(profile: Profile, workoutPreferences: WorkoutPreferences | null, dietPreferences: DietPreferences | null) {
   // Validar se profile existe e tem dados necessários
   if (!profile || !profile.weight || !profile.height || !profile.age || !profile.gender) {
     throw new Error('Dados do perfil incompletos ou inválidos');
@@ -164,10 +185,10 @@ function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, 
   const { injuries } = dietPreferences || {};
   
   // Determinar intensidade baseada no nível de atividade e objetivos
-  const intensity = determineWorkoutIntensity(activity_level, goals?.[0]);
+  const intensity = determineWorkoutIntensity(activity_level, goals?.[0] || 'general_fitness');
   
   // Gerar treinos baseados no tipo e intensidade
-  const workouts = generateWorkouts(workout_type, intensity, injuries || []);
+  const workouts = generateWorkouts(workout_type || 'mixed', intensity, injuries || []);
   
   // Calcular duração baseada nas preferências
   const duration = workout_duration || '60min';
@@ -191,8 +212,8 @@ function generatePersonalizedWorkoutPlan(profile: any, workoutPreferences: any, 
     },
     intensity,
     workouts,
-    schedule: generateWorkoutSchedule(days, preferred_time),
-    recommendations: generateWorkoutRecommendations(workout_type, goals?.[0], injuries || []),
+    schedule: generateWorkoutSchedule(days, preferred_time || 'flexible'),
+    recommendations: generateWorkoutRecommendations(workout_type || 'mixed', goals?.[0] || 'general_fitness', injuries || []),
     safetyNotes: generateSafetyNotes(injuries || [], age, activity_level)
   };
 }
@@ -464,7 +485,7 @@ function generateWorkoutRecommendations(workoutType: string, goal: string, injur
     ]
   };
 
-  let selectedRecommendations = [...recommendations.general];
+  const selectedRecommendations = [...recommendations.general];
   
   if (workoutType && recommendations[workoutType as keyof typeof recommendations]) {
     selectedRecommendations.push(...recommendations[workoutType as keyof typeof recommendations]);

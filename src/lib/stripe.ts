@@ -114,8 +114,14 @@ export const formatPrice = (price: number, currency: string = 'BRL') => {
   }).format(price);
 };
 
+interface Subscription {
+  trial_ends_at: string;
+  subscription_ends_at?: string;
+  subscribed: boolean;
+}
+
 // Check if subscription is active
-export const isSubscriptionActive = (subscription: any) => {
+export const isSubscriptionActive = (subscription: Subscription | null) => {
   if (!subscription) return false;
   
   const now = new Date();
@@ -132,7 +138,7 @@ export const isSubscriptionActive = (subscription: any) => {
 };
 
 // Get subscription status
-export const getSubscriptionStatus = (subscription: any) => {
+export const getSubscriptionStatus = (subscription: Subscription | null) => {
   if (!subscription) return 'inactive';
   
   const now = new Date();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { CustomButton } from "@/components/ui/custom-button";
 import { Logo } from "@/components/Logo";
@@ -81,13 +81,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (user?.id) {
-      loadUserProfile();
-    }
-  }, [user?.id]);
-
-  const loadUserProfile = async () => {
+  const loadUserProfile = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -100,7 +94,7 @@ export default function Profile() {
         .eq('user_id', user.id)
         .single();
 
-      if (profileError && profileError.code !== 'PGRST116') {
+      if (profileError) {
         console.error('Erro ao carregar perfil:', profileError);
         return;
       }
@@ -112,12 +106,20 @@ export default function Profile() {
         .eq('user_id', user.id)
         .single();
 
-      // Carregar preferências de dieta
+      if (workoutError && workoutError.code !== 'PGRST116') {
+        console.error('Erro ao carregar preferências de treino:', workoutError);
+      }
+
+      // Carregar preferências dietéticas
       const { data: dietData, error: dietError } = await supabase
         .from('dietary_preferences')
         .select('*')
         .eq('user_id', user.id)
         .single();
+
+      if (dietError && dietError.code !== 'PGRST116') {
+        console.error('Erro ao carregar preferências dietéticas:', dietError);
+      }
 
       // Carregar preferências de notificação
       const { data: notificationData, error: notificationError } = await supabase
@@ -126,39 +128,43 @@ export default function Profile() {
         .eq('user_id', user.id)
         .single();
 
+      if (notificationError && notificationError.code !== 'PGRST116') {
+        console.error('Erro ao carregar preferências de notificação:', notificationError);
+      }
+
       // Combinar todos os dados
       const combinedProfile: UserProfile = {
         personalInfo: {
-          name: profileData?.name || profileData?.full_name || user?.user_metadata?.full_name || 'Usuário', // Adicionando fallback para name
-          email: user?.email || '',
+          name: profileData?.full_name || profileData?.name || '',
+          email: user.email || '',
           age: profileData?.age || 0,
-          gender: profileData?.gender === 'masculino' ? 'male' : 
-                  profileData?.gender === 'feminino' ? 'female' : 'other',
+          gender: (profileData?.gender === 'masculino' ? 'male' : 
+                  profileData?.gender === 'feminino' ? 'female' : 'other') as 'male' | 'female' | 'other',
           height: profileData?.height || 0,
           weight: profileData?.weight || 0,
-          activityLevel: profileData?.activity_level === 'sedentario' ? 'sedentary' :
-                        profileData?.activity_level === 'leve' ? 'light' :
-                        profileData?.activity_level === 'moderado' ? 'moderate' :
-                        profileData?.activity_level === 'intenso' ? 'active' : 'very_active'
+          activityLevel: (profileData?.activity_level === 'sedentario' ? 'sedentary' :
+                         profileData?.activity_level === 'leve' ? 'light' :
+                         profileData?.activity_level === 'moderado' ? 'moderate' :
+                         profileData?.activity_level === 'intenso' ? 'active' : 'very_active') as 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active'
         },
         fitnessGoals: {
-          primary: profileData?.goals?.[0] || 'general_fitness',
+          primary: (profileData?.goals?.[0] as 'weight_loss' | 'muscle_gain' | 'maintenance' | 'strength' | 'endurance' | 'flexibility' | 'general_fitness') || 'general_fitness',
           secondary: profileData?.goals?.slice(1) || [],
-          targetWeight: profileData?.weight || 0,
-          targetDate: new Date().toISOString().split('T')[0]
+          targetWeight: undefined,
+          targetDate: ''
         },
         preferences: {
-          dietType: dietData?.diet_type || 'balanced',
-          workoutType: workoutData?.workout_type || 'mixed',
-          workoutDuration: workoutData?.workout_duration || '60min',
+          dietType: (dietData?.diet_type as 'balanced' | 'low_carb' | 'high_protein' | 'vegetarian' | 'vegan' | 'keto' | 'paleo' | 'mediterranean' | 'dash' | 'custom') || 'balanced',
+          workoutType: (workoutData?.workout_type as 'strength' | 'cardio' | 'flexibility' | 'mixed' | 'yoga' | 'pilates' | 'crossfit' | 'running' | 'cycling' | 'swimming') || 'mixed',
+          workoutDuration: (workoutData?.workout_duration as '15min' | '30min' | '45min' | '60min' | '75min' | '90min' | '120min') || '30min',
           workoutDays: workoutData?.workout_days || 0,
           notifications: {
-            meals: notificationData?.meals ?? true,
-            workouts: notificationData?.workouts ?? true,
-            progress: notificationData?.progress ?? true,
-            reminders: notificationData?.reminders ?? false,
-            achievements: notificationData?.achievements ?? true,
-            weeklyReports: notificationData?.weekly_reports ?? true
+            meals: notificationData?.meals || false,
+            workouts: notificationData?.workouts || false,
+            progress: notificationData?.progress || false,
+            reminders: notificationData?.reminders || false,
+            achievements: notificationData?.achievements || false,
+            weeklyReports: notificationData?.weekly_reports || false
           }
         },
         restrictions: {
@@ -175,7 +181,13 @@ export default function Profile() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, user?.email]);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadUserProfile();
+    }
+  }, [user?.id, loadUserProfile]);
 
   const handleSave = async () => {
     if (!user?.id || !profile) return;
@@ -283,7 +295,7 @@ export default function Profile() {
     await requestNotificationPermission();
   };
 
-  const updateProfile = (section: keyof UserProfile, field: string, value: any) => {
+  const updateProfile = (section: keyof UserProfile, field: string, value: string | number | string[] | boolean | { [key: string]: boolean }) => {
     if (profile) {
       setProfile({
         ...profile,

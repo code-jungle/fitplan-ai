@@ -163,6 +163,102 @@ export type Database = {
           updated_at?: string
         }
       }
+      progress_tracking: {
+        Row: {
+          id: string
+          user_id: string
+          weight: number
+          body_fat?: number | null
+          muscle_mass?: number | null
+          measurements?: Json | null
+          record_date: string
+          notes?: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          weight: number
+          body_fat?: number | null
+          muscle_mass?: number | null
+          measurements?: Json | null
+          record_date: string
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          weight?: number
+          body_fat?: number | null
+          muscle_mass?: number | null
+          measurements?: Json | null
+          record_date?: string
+          notes?: string | null
+          created_at?: string
+        }
+      }
+      meal_plans: {
+        Row: {
+          id: string
+          user_id: string
+          plan_date: string
+          plan_data: Json
+          calories_target: number | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_date: string
+          plan_data: Json
+          calories_target?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_date?: string
+          plan_data?: Json
+          calories_target?: number | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      workout_plans: {
+        Row: {
+          id: string
+          user_id: string
+          plan_date: string
+          plan_data: Json
+          duration_minutes: number | null
+          difficulty_level: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_date: string
+          plan_data: Json
+          duration_minutes?: number | null
+          difficulty_level?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_date?: string
+          plan_data?: Json
+          duration_minutes?: number | null
+          difficulty_level?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -240,12 +336,15 @@ export type Enums<
     | keyof (DatabaseWithoutInternals["public"]["Enums"])
     | { schema: keyof DatabaseWithoutInternals["public"]["Enums"] },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Enums"] }
-    ? keyof (DatabaseWithoutInternals["public"]["Enums"][PublicEnumNameOrOptions["schema"]])
+    ? keyof (DatabaseWithoutInternals["public"]["Enums"])
     : never = never
-> = PublicEnumNameOrOptions extends { schema: keyof DatabaseWithoutInternals["public"]["Enums"] }
-  ? DatabaseWithoutInternals["public"]["Enums"][PublicEnumNameOrOptions["schema"]]
+> = PublicEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals["public"]["Enums"]
+}
+  ? DatabaseWithoutInternals["public"]["Enums"][PublicEnumNameOrOptions["schema"]][PublicEnumNameOrOptions]
   : PublicEnumNameOrOptions extends keyof DatabaseWithoutInternals["public"]["Enums"]
-  : never
+    ? DatabaseWithoutInternals["public"]["Enums"][PublicEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends

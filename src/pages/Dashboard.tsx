@@ -4,7 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { DashboardData } from "@/types/dashboard";
 import { 
   Activity,
   Apple,
@@ -29,23 +30,16 @@ export default function Dashboard() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [generatingMeal, setGeneratingMeal] = useState(false);
   const [generatingWorkout, setGeneratingWorkout] = useState(false);
 
-  useEffect(() => {
-    if (user?.id) {
-      loadDashboardData();
-    }
-  }, [user?.id]);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     if (!user?.id) return;
 
     try {
       setLoading(true);
-      console.log('🔍 Iniciando loadDashboardData para userId:', user.id);
       
       // Carregar dados do perfil
       const { data: profileData, error: profileError } = await supabase
@@ -56,8 +50,6 @@ export default function Dashboard() {
 
       if (profileError) {
         console.error('❌ Erro ao carregar perfil:', profileError);
-      } else {
-        console.log('✅ Perfil carregado:', profileData);
       }
 
       // Carregar dados de progresso
@@ -70,36 +62,46 @@ export default function Dashboard() {
 
       if (progressError) {
         console.error('❌ Erro ao carregar progresso:', progressError);
-      } else {
-        console.log('✅ Progresso carregado:', progressData);
       }
 
-      // Carregar planos de hoje
+      // Carregar planos de hoje (com tratamento de erro melhorado)
       const today = new Date().toISOString().split('T')[0];
-      const { data: mealPlan, error: mealError } = await supabase
-        .from('meal_plans')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('plan_date', today)
-        .single();
+      
+      let mealPlan = null;
+      let workoutPlan = null;
 
-      if (mealError && mealError.code !== 'PGRST116') {
-        console.error('❌ Erro ao carregar plano alimentar:', mealError);
-      } else {
-        console.log('✅ Plano alimentar carregado:', mealPlan);
+      try {
+        const { data: mealPlanData, error: mealError } = await supabase
+          .from('meal_plans')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('plan_date', today)
+          .single();
+
+        if (mealError && mealError.code !== 'PGRST116') {
+          console.error('❌ Erro ao carregar plano alimentar:', mealError);
+        } else {
+          mealPlan = mealPlanData;
+        }
+      } catch (error) {
+        console.error('❌ Erro na consulta de plano alimentar:', error);
       }
 
-      const { data: workoutPlan, error: workoutError } = await supabase
-        .from('workout_plans')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('plan_date', today)
-        .single();
+      try {
+        const { data: workoutPlanData, error: workoutError } = await supabase
+          .from('workout_plans')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('plan_date', today)
+          .single();
 
-      if (workoutError && workoutError.code !== 'PGRST116') {
-        console.error('❌ Erro ao carregar plano de treino:', workoutError);
-      } else {
-        console.log('✅ Plano de treino carregado:', workoutPlan);
+        if (workoutError && workoutError.code !== 'PGRST116') {
+          console.error('❌ Erro ao carregar plano de treino:', workoutError);
+        } else {
+          workoutPlan = workoutPlanData;
+        }
+      } catch (error) {
+        console.error('❌ Erro na consulta de plano de treino:', error);
       }
 
       const dashboardDataToSet = {
@@ -109,14 +111,21 @@ export default function Dashboard() {
         workoutPlan
       };
 
-      console.log('📊 Dashboard data a ser definida:', dashboardDataToSet);
       setDashboardData(dashboardDataToSet);
     } catch (error) {
       console.error('💥 Erro geral ao carregar dados do dashboard:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadDashboardData();
+    }
+  }, [user?.id, loadDashboardData]);
+
+
 
   // Calcular calorias baseado no perfil do usuário
   const calculateDailyCalories = () => {

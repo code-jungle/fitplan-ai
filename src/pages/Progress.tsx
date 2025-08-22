@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { CustomButton } from "@/components/ui/custom-button";
@@ -66,13 +66,7 @@ export default function Progress() {
   const [newWeight, setNewWeight] = useState('');
   const [isAddingWeight, setIsAddingWeight] = useState(false);
 
-  useEffect(() => {
-    if (user?.id) {
-      loadProgressData();
-    }
-  }, [user?.id]);
-
-  const loadProgressData = async () => {
+  const loadProgressData = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -99,7 +93,7 @@ export default function Progress() {
 
         const weeklyProgress = progressRecords.slice(0, 6).map((record, index) => ({
           week: `Sem ${index + 1}`,
-          weight: record.weight,
+          weight: record.weight || 0,
           date: record.record_date
         }));
 
@@ -112,12 +106,12 @@ export default function Progress() {
           });
         }
 
-        setProgressData({
+        setProgressData(prev => ({
+          ...prev,
           currentWeight,
           goalWeight,
           startWeight,
           weeklyProgress,
-          measurements: {},
           weeklyStats: {
             workoutsCompleted: 0,
             workoutsGoal: 5,
@@ -126,11 +120,12 @@ export default function Progress() {
             waterAvg: 0,
             waterGoal: 2.5
           }
-        });
+        }));
       } else {
         // Se não há dados de progresso, usar peso inicial do perfil
         const startWeight = profileData?.weight || 70;
-        setProgressData({
+        setProgressData(prev => ({
+          ...prev,
           currentWeight: startWeight,
           goalWeight: startWeight * 0.9,
           startWeight,
@@ -148,7 +143,7 @@ export default function Progress() {
             waterAvg: 0,
             waterGoal: 2.5
           }
-        });
+        }));
       }
     } catch (error) {
       console.error('Erro ao carregar dados de progresso:', error);
@@ -160,7 +155,13 @@ export default function Progress() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, toast]);
+
+  useEffect(() => {
+    if (user?.id) {
+      loadProgressData();
+    }
+  }, [user?.id, loadProgressData]);
 
   const handleAddWeight = async () => {
     if (!newWeight || !user?.id) return;

@@ -17,7 +17,7 @@ export function usePWA() {
     notificationsEnabled: false,
   });
 
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
 
   useEffect(() => {
     // Check if app is installed

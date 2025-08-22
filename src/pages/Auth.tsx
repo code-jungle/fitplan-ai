@@ -188,11 +188,12 @@ export default function Auth() {
         if (!error) {
           navigate('/dashboard');
         }
-      } catch (error: any) {
-        console.error('Authentication error:', error);
-      } finally {
-        setLoading(false);
-      }
+          } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro de autenticação';
+      console.error('Authentication error:', error);
+    } finally {
+      setLoading(false);
+    }
     } else {
       // Handle signup completion
       setLoading(true);
@@ -214,7 +215,8 @@ export default function Auth() {
             navigate('/dashboard');
           }
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Erro ao criar conta';
         console.error('Signup error:', error);
         toast({
           title: "Erro ao criar conta",
@@ -227,7 +229,7 @@ export default function Auth() {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | string[] | boolean | { [key: string]: boolean }) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -255,13 +257,12 @@ export default function Auth() {
 
   const saveUserProfile = async (userId: string) => {
     try {
-      console.log('🔍 Iniciando saveUserProfile para userId:', userId);
-      console.log('📝 Dados do formulário:', formData);
+      // Logs removidos para produção
       
       // Mapear dados do formulário para o formato do banco
       const profileData = {
         user_id: userId,
-        name: formData.name, // Mudando de full_name para name
+        full_name: formData.name, // Corrigindo para usar full_name conforme schema
         age: formData.age,
         gender: formData.gender === 'male' ? 'masculino' : formData.gender === 'female' ? 'feminino' : 'outro',
         weight: formData.weight,
@@ -276,7 +277,7 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      console.log('💾 Dados do perfil a serem salvos:', profileData);
+      // Log removido para produção
 
       // Salvar perfil principal
       const { data: profileResult, error: profileError } = await supabase
@@ -289,7 +290,7 @@ export default function Auth() {
         throw profileError;
       }
 
-      console.log('✅ Perfil salvo com sucesso:', profileResult);
+      // Log removido para produção
 
       // Salvar dados de treino
       const workoutData = {
@@ -302,7 +303,7 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      console.log('💪 Dados de treino a serem salvos:', workoutData);
+      // Log removido para produção
 
       const { data: workoutResult, error: workoutError } = await supabase
         .from('workout_preferences')
@@ -313,7 +314,7 @@ export default function Auth() {
         console.error('❌ Erro ao salvar preferências de treino:', workoutError);
         // Não falhar se não conseguir salvar preferências de treino
       } else {
-        console.log('✅ Preferências de treino salvas com sucesso:', workoutResult);
+        // Log removido para produção
       }
 
       // Salvar dados de dieta
@@ -328,7 +329,7 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      console.log('🍽️ Dados de dieta a serem salvos:', dietData);
+      // Log removido para produção
 
       const { data: dietResult, error: dietError } = await supabase
         .from('dietary_preferences')
@@ -339,7 +340,7 @@ export default function Auth() {
         console.error('❌ Erro ao salvar preferências de dieta:', dietError);
         // Não falhar se não conseguir salvar preferências de dieta
       } else {
-        console.log('✅ Preferências de dieta salvas com sucesso:', dietResult);
+        // Log removido para produção
       }
 
       // Salvar configurações de notificação
@@ -355,7 +356,7 @@ export default function Auth() {
         updated_at: new Date().toISOString()
       };
 
-      console.log('🔔 Dados de notificação a serem salvos:', notificationData);
+      // Log removido para produção
 
       const { data: notificationResult, error: notificationError } = await supabase
         .from('notification_preferences')
@@ -366,10 +367,10 @@ export default function Auth() {
         console.error('❌ Erro ao salvar preferências de notificação:', notificationError);
         // Não falhar se não conseguir salvar notificações
       } else {
-        console.log('✅ Preferências de notificação salvas com sucesso:', notificationResult);
+        // Log removido para produção
       }
 
-      console.log('🎉 Todos os dados foram salvos com sucesso!');
+      // Log removido para produção
 
       toast({
         title: "Perfil criado com sucesso!",

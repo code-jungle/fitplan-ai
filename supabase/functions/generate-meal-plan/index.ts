@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Security: Restrict CORS to specific origins
 const allowedOrigins = [
@@ -26,8 +26,8 @@ serve(async (req) => {
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      Deno.env.get('SUPABASE_URL') || '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
       { auth: { persistSession: false } }
     );
 
@@ -141,7 +141,24 @@ serve(async (req) => {
   }
 });
 
-function generatePersonalizedMealPlan(profile: any, dietPreferences: any) {
+interface Profile {
+  full_name?: string;
+  age: number;
+  weight: number;
+  height: number;
+  gender: string;
+  activity_level: string;
+  goals?: string[];
+}
+
+interface DietPreferences {
+  diet_type?: string;
+  allergies?: string[];
+  intolerances?: string[];
+  medications?: string[];
+}
+
+function generatePersonalizedMealPlan(profile: Profile, dietPreferences: DietPreferences | null) {
   // Validar se profile existe e tem dados necessários
   if (!profile || !profile.weight || !profile.height || !profile.age || !profile.gender) {
     throw new Error('Dados do perfil incompletos ou inválidos');
@@ -154,10 +171,10 @@ function generatePersonalizedMealPlan(profile: any, dietPreferences: any) {
   // Calcular necessidades calóricas
   const bmr = calculateBMR(weight, height, age, gender);
   const tdee = calculateTDEE(bmr, activity_level);
-  const targetCalories = adjustCaloriesForGoal(tdee, goals?.[0]);
+  const targetCalories = adjustCaloriesForGoal(tdee, goals?.[0] || 'maintenance');
   
   // Gerar refeições baseadas no tipo de dieta e restrições
-  const meals = generateMeals(diet_type, targetCalories, allergies || [], intolerances || []);
+  const meals = generateMeals(diet_type || 'balanced', targetCalories, allergies || [], intolerances || []);
   
   return {
     userInfo: {
@@ -176,7 +193,7 @@ function generatePersonalizedMealPlan(profile: any, dietPreferences: any) {
       fats: Math.round(targetCalories * 0.3 / 9)    // 30% das calorias
     },
     meals,
-    recommendations: generateDietRecommendations(diet_type, goals?.[0]),
+    recommendations: generateDietRecommendations(diet_type || 'balanced', goals?.[0] || 'maintenance'),
     restrictions: {
       allergies: allergies || [],
       intolerances: intolerances || [],
@@ -370,7 +387,7 @@ function generateDietRecommendations(dietType: string, goal: string) {
     ]
   };
 
-  let selectedRecommendations = [...recommendations.general];
+  const selectedRecommendations = [...recommendations.general];
   
   if (dietType && recommendations[dietType as keyof typeof recommendations]) {
     selectedRecommendations.push(...recommendations[dietType as keyof typeof recommendations]);

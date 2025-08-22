@@ -3,12 +3,14 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+import { AuthError, AuthResponse } from '@/types/dashboard';
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any; data?: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<AuthResponse>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -62,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      console.log('Attempting signup with:', { email, fullName });
+      // Log removido para produção
       
       const { error, data } = await supabase.auth.signUp({
         email,
@@ -85,21 +87,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error };
       }
 
-      console.log('Signup successful:', data);
+      // Log removido para produção
       toast({
         title: "Cadastro realizado!",
         description: "Verifique seu e-mail para confirmar a conta.",
       });
 
       return { error: null, data };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       console.error('Unexpected signup error:', error);
       toast({
         title: "Erro inesperado",
         description: "Ocorreu um erro durante o cadastro. Tente novamente.",
         variant: "destructive",
       });
-      return { error };
+      return { error: { message: errorMessage } };
     }
   };
 
@@ -120,8 +123,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       return { error: null };
-    } catch (error: any) {
-      return { error };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      return { error: { message: errorMessage } };
     }
   };
 
