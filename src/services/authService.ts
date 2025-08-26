@@ -22,7 +22,14 @@ export class AuthService {
       
       if (response.success && response.user && response.token) {
         // Salvar dados da sessão
-        this.saveSession(response.user, response.token, response.expiresAt);
+        if (response.expiresAt) {
+          this.saveSession(response.user, response.token, response.expiresAt);
+        } else {
+          // Se não houver expiresAt, criar um padrão de 24 horas
+          const expiresAt = new Date();
+          expiresAt.setHours(expiresAt.getHours() + 24);
+          this.saveSession(response.user, response.token, expiresAt.toISOString());
+        }
         console.log('Login realizado com sucesso para:', response.user.nome);
         return { success: true, user: response.user, token: response.token };
       } else {

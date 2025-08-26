@@ -12,7 +12,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
   onNavigate,
   className = ''
 }) => {
-  const actions = [
+  const actions: Array<{ id: Page; title: string; description: string; icon: React.ReactNode; color: string }> = [
     {
       id: 'progresso',
       title: 'Ver Progresso',
@@ -25,9 +25,9 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'mint'
     },
     {
-      id: 'dashboard',
+      id: 'progresso',
       title: 'Meus Exercícios',
-      description: 'Disponível no dashboard',
+      description: 'Visualize seu plano de treino',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -36,20 +36,20 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'lavanda'
     },
     {
-      id: 'dashboard',
+      id: 'progresso',
       title: 'Minhas Refeições',
-      description: 'Disponível no dashboard',
+      description: 'Controle sua alimentação',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 12.477 5.754 12 7.5 12s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 12.477 18.246 12 16.5 12c-1.746 0-3.332.477-4.5 1.253" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 12.477 5.754 12 7.5 12s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 12.477 18.246 12 16.5 12c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       ),
       color: 'blue'
     },
     {
-      id: 'dashboard',
+      id: 'progresso',
       title: 'Meu Perfil',
-      description: 'Disponível no dashboard',
+      description: 'Gerencie suas informações',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -76,7 +76,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
         {actions.map((action) => (
           <button
             key={action.id}
-            onClick={() => onNavigate(action.id)}
+                         onClick={() => onNavigate(action.id)}
             className={`flex flex-col items-center justify-center h-24 p-4 rounded-xl border border-white/20 transition-all duration-300 ${getColorClasses(action.color)}`}
           >
             <div className="mb-2">{action.icon}</div>
