@@ -38,6 +38,18 @@ export const api = {
     return mockUser;
   },
 
+  getUserById: async (userId: string): Promise<User> => {
+    // Simula delay de rede
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Simula busca por ID (por enquanto retorna o mockUser)
+    if (userId === '1' || userId === '2') {
+      return mockUser;
+    }
+    
+    throw new Error('Usuário não encontrado');
+  },
+
   updateUser: async (userData: Partial<User>): Promise<User> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { ...mockUser, ...userData };

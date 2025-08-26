@@ -268,17 +268,7 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate }) => {
                 Limpar
               </Button>
               
-              {/* Botão de teste simples */}
-              <button
-                type="button"
-                onClick={() => {
-                  console.log('=== BOTÃO DE TESTE CLICADO ===');
-                  alert('Botão de teste funcionando!');
-                }}
-                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold"
-              >
-                Teste
-              </button>
+            
             </div>
 
             {/* Link para Login */}
