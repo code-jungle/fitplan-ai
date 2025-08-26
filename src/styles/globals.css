@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-white/20;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-slate-900 via-graphite-900 to-slate-800 text-white font-inter;
+    min-height: 100vh;
+    background-attachment: fixed;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl;
+  }
+  
+  .glass-button {
+    @apply bg-gradient-to-r from-mint-400 to-lavanda-500 text-white font-semibold py-3 px-6 rounded-xl 
+           shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 
+           active:scale-95 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:ring-opacity-50;
+  }
+  
+  .glass-button-secondary {
+    @apply bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold py-3 px-6 rounded-xl 
+           shadow-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 
+           active:scale-95 focus:outline-none focus:ring-2 focus:ring-white/30 focus:ring-opacity-50;
+  }
+  
+  .futuristic-text {
+    @apply font-orbitron font-bold bg-gradient-to-r from-mint-300 to-lavanda-300 bg-clip-text text-transparent;
+  }
+  
+  .gradient-border {
+    @apply relative;
+  }
+  
+  .gradient-border::before {
+    content: '';
+    @apply absolute inset-0 rounded-2xl p-[2px] bg-gradient-to-r from-mint-400 to-lavanda-500;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+}
