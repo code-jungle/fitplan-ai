@@ -100,6 +100,38 @@ export const api = {
     return newEntry;
   },
 
+  updateProgressEntry: async (date: string, updates: Partial<ProgressData>): Promise<ProgressData> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Simula busca e atualização de uma entrada existente
+    const existingEntry = mockProgressData.find(entry => entry.data === date);
+    if (!existingEntry) {
+      throw new Error('Entrada de progresso não encontrada');
+    }
+    
+    const updatedEntry: ProgressData = {
+      ...existingEntry,
+      ...updates
+    };
+    
+    return updatedEntry;
+  },
+
+  deleteProgressEntry: async (date: string): Promise<boolean> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Simula remoção de uma entrada
+    const entryIndex = mockProgressData.findIndex(entry => entry.data === date);
+    if (entryIndex === -1) {
+      throw new Error('Entrada de progresso não encontrada');
+    }
+    
+    // Em um cenário real, removeria do array
+    // mockProgressData.splice(entryIndex, 1);
+    
+    return true;
+  },
+
   // Exercícios
   getExercises: async (): Promise<Exercise[]> => {
     await new Promise(resolve => setTimeout(resolve, 500));
