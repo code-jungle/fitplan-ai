@@ -1,13 +1,16 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { PlanGenerator } from '../services/planGenerator';
-import { GeneratedPlan, DietPlan, TrainingPlan } from '../types';
+import { PlanAdjuster, PlanAdjustmentResult } from '../services/planAdjuster';
+import { GeneratedPlan, DietPlan, TrainingPlan, ProgressData } from '../types';
 
 export interface PlanState {
   currentPlan: GeneratedPlan | null;
   isLoading: boolean;
   error: string | null;
   hasGeneratedPlan: boolean;
+  lastAdjustment: PlanAdjustmentResult | null;
+  showAdjustmentNotification: boolean;
 }
 
 export const usePlans = () => {
@@ -16,7 +19,9 @@ export const usePlans = () => {
     currentPlan: null,
     isLoading: false,
     error: null,
-    hasGeneratedPlan: false
+    hasGeneratedPlan: false,
+    lastAdjustment: null,
+    showAdjustmentNotification: false
   });
 
   /**
@@ -199,6 +204,76 @@ export const usePlans = () => {
   }, [user]);
 
   /**
+   * Ajusta automaticamente o plano baseado no progresso do usuário
+   */
+  const adjustPlanAutomatically = useCallback(async (
+    progressData: ProgressData[]
+  ) => {
+    if (!user || !planState.currentPlan || progressData.length === 0) {
+      return null;
+    }
+
+    try {
+      setPlanState(prev => ({
+        ...prev,
+        isLoading: true,
+        error: null
+      }));
+
+      // Simular delay de processamento
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      const lastProgress = progressData[progressData.length - 1];
+      const adjustmentResult = PlanAdjuster.adjustPlanBasedOnProgress(
+        planState.currentPlan,
+        user,
+        progressData,
+        lastProgress
+      );
+
+      // Atualizar o plano atual
+      setPlanState(prev => ({
+        ...prev,
+        currentPlan: adjustmentResult.plan,
+        isLoading: false,
+        lastAdjustment: adjustmentResult,
+        showAdjustmentNotification: true
+      }));
+
+      // Salvar plano ajustado no localStorage
+      localStorage.setItem('fitplan_current_plan', JSON.stringify(adjustmentResult.plan));
+
+      // Ocultar notificação após 5 segundos
+      setTimeout(() => {
+        setPlanState(prev => ({
+          ...prev,
+          showAdjustmentNotification: false
+        }));
+      }, 5000);
+
+      return adjustmentResult;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao ajustar plano';
+      setPlanState(prev => ({
+        ...prev,
+        error: errorMessage,
+        isLoading: false
+      }));
+      return null;
+    }
+  }, [user, planState.currentPlan]);
+
+  /**
+   * Ocultar notificação de ajuste
+   */
+  const hideAdjustmentNotification = useCallback(() => {
+    setPlanState(prev => ({
+      ...prev,
+      showAdjustmentNotification: false
+    }));
+  }, []);
+
+  /**
    * Remove plano atual
    */
   const removePlan = useCallback(() => {
@@ -307,8 +382,10 @@ export const usePlans = () => {
     loadExistingPlan,
     updatePlan,
     regeneratePlan,
+    adjustPlanAutomatically,
     removePlan,
     clearError,
+    hideAdjustmentNotification,
     
     // Utilitários
     isPlanExpiringSoon,

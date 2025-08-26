@@ -16,6 +16,7 @@ export interface UpdateProgressData {
 
 export const useProgress = () => {
   const { user } = useAuth();
+  const { adjustPlanAutomatically } = usePlans();
   const [progressData, setProgressData] = useState<ProgressData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +50,16 @@ export const useProgress = () => {
         agua: data.agua
       });
       
-      setProgressData(prev => [newEntry, ...prev]);
+      const updatedProgressData = [newEntry, ...progressData];
+      setProgressData(updatedProgressData);
+      
+      // Ajustar automaticamente o plano baseado no novo progresso
+      if (updatedProgressData.length >= 2) {
+        setTimeout(() => {
+          adjustPlanAutomatically(updatedProgressData);
+        }, 1000); // Delay para permitir que a UI atualize primeiro
+      }
+      
       return newEntry;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao adicionar progresso');
@@ -57,7 +67,7 @@ export const useProgress = () => {
     } finally {
       setIsUpdating(false);
     }
-  }, []);
+  }, [progressData, adjustPlanAutomatically]);
 
   // Atualizar entrada de progresso existente
   const updateProgressEntry = useCallback(async (date: string, updates: Partial<ProgressData>) => {

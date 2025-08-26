@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePlans } from '../hooks/usePlans';
 import { useAuth } from '../contexts/AuthContext';
-import { PlanSummary, DietPlanDetails, TrainingPlanDetails } from '../components/plans';
+import { PlanSummary, DietPlanDetails, TrainingPlanDetails, PlanAdjustmentNotification } from '../components/plans';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { GeneratedPlan } from '../types';
@@ -22,7 +22,10 @@ const Planos: React.FC = () => {
     clearError,
     isPlanExpiringSoon,
     getPlanStats,
-    getNextActions
+    getNextActions,
+    lastAdjustment,
+    showAdjustmentNotification,
+    hideAdjustmentNotification
   } = usePlans();
 
   const [viewMode, setViewMode] = useState<ViewMode>('summary');
@@ -355,6 +358,14 @@ const Planos: React.FC = () => {
 
         {/* Modal de Geração */}
         {showGenerateModal && renderGeneratePlanModal()}
+
+        {/* Notificação de Ajuste Automático */}
+        {showAdjustmentNotification && lastAdjustment && (
+          <PlanAdjustmentNotification
+            adjustment={lastAdjustment}
+            onClose={hideAdjustmentNotification}
+          />
+        )}
       </div>
     </div>
   );

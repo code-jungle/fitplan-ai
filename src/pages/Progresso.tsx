@@ -16,6 +16,7 @@ interface ProgressoProps extends NavigationProps {}
 
 const Progresso: React.FC<ProgressoProps> = ({ onNavigate }) => {
   const { user } = useAuth();
+  const { showAdjustmentNotification, lastAdjustment, hideAdjustmentNotification } = usePlans();
   const {
     progressData,
     isLoading,
@@ -331,6 +332,14 @@ const Progresso: React.FC<ProgressoProps> = ({ onNavigate }) => {
               />
             </div>
           </div>
+        )}
+
+        {/* Notificação de Ajuste Automático */}
+        {showAdjustmentNotification && lastAdjustment && (
+          <PlanAdjustmentNotification
+            adjustment={lastAdjustment}
+            onClose={hideAdjustmentNotification}
+          />
         )}
       </div>
     </div>
