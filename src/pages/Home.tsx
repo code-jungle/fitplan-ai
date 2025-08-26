@@ -21,7 +21,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
 
         {/* Welcome Card */}
-        <Card gradient className="mb-8 text-center animate-float">
+        <Card gradient className="mb-8 text-center animate-float relative z-0">
           <div className="mb-6">
             <div className="w-20 h-20 bg-gradient-to-r from-mint-400 to-lavanda-500 rounded-full mx-auto mb-4 flex items-center justify-center animate-glow">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,12 +38,31 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => onNavigate('cadastro')}>
+            <Button 
+              size="lg" 
+              onClick={() => {
+                console.log('Botão Começar Jornada clicado!');
+                console.log('onNavigate function:', onNavigate);
+                console.log('Tentando navegar para cadastro...');
+                onNavigate('cadastro');
+                console.log('Navegação executada');
+              }}
+              className="relative z-10 cursor-pointer"
+            >
               Começar Jornada
             </Button>
-            <Button variant="secondary" size="lg" onClick={() => onNavigate('login')}>
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              onClick={() => {
+                console.log('Botão Já tenho conta clicado!');
+                onNavigate('login');
+              }}
+              className="relative z-10 cursor-pointer"
+            >
               Já tenho conta
             </Button>
+            
           </div>
         </Card>
 
@@ -81,7 +100,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         </div>
 
         {/* Pricing Card */}
-        <Card gradient className="text-center mb-8">
+        <Card gradient className="text-center mb-8 relative z-0">
           <div className="mb-6">
             <div className="w-16 h-16 bg-gradient-to-r from-mint-400 to-lavanda-500 rounded-full mx-auto mb-4 flex items-center justify-center">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +155,17 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           </div>
           
           <div className="flex justify-center">
-            <Button size="lg" onClick={() => onNavigate('cadastro')}>
+            <Button 
+              size="lg" 
+              onClick={() => {
+                console.log('Botão Começar Teste Gratuito clicado!');
+                console.log('onNavigate function:', onNavigate);
+                console.log('Tentando navegar para cadastro...');
+                onNavigate('cadastro');
+                console.log('Navegação executada');
+              }}
+              className="relative z-10 cursor-pointer"
+            >
               Começar Teste Gratuito
             </Button>
           </div>

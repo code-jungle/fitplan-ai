@@ -1,59 +1,22 @@
 // Serviço de API para o FitPlan AI
 // Por enquanto com dados mock, mas preparado para integração futura
 
-export interface User {
-  id: string;
-  nome: string;
-  email: string;
-  objetivo: string;
-  pesoInicial: number;
-  pesoAtual: number;
-  pesoMeta: number;
-  altura: number;
-  idade: number;
-  genero: string;
-}
-
-export interface ProgressData {
-  data: string;
-  peso: number;
-  calorias: number;
-  exercicios: number;
-  agua: number;
-}
-
-export interface Exercise {
-  id: string;
-  nome: string;
-  categoria: string;
-  intensidade: string;
-  duracao: number;
-  calorias: number;
-}
-
-export interface Meal {
-  id: string;
-  nome: string;
-  categoria: string;
-  calorias: number;
-  proteinas: number;
-  carboidratos: number;
-  gorduras: number;
-  horario: string;
-}
+import { User, ProgressData, Exercise, Meal, CreateUserRequest } from '../types';
 
 // Mock data para desenvolvimento
 const mockUser: User = {
   id: '1',
   nome: 'João Silva',
   email: 'joao@example.com',
-  objetivo: 'perder-peso',
-  pesoInicial: 80.0,
-  pesoAtual: 75.5,
-  pesoMeta: 70.0,
-  altura: 175,
   idade: 28,
-  genero: 'masculino'
+  peso: 75.5,
+  altura: 175,
+  sexo: 'masculino',
+  restricoesAlimentares: ['lactose'],
+  preferencias: ['exercicios-cardio', 'dieta-vegetariana'],
+  nivelAtividade: 'moderado',
+  objetivo: 'perder-peso',
+  dataCadastro: '2024-01-01'
 };
 
 const mockProgressData: ProgressData[] = [
@@ -78,6 +41,36 @@ export const api = {
   updateUser: async (userData: Partial<User>): Promise<User> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { ...mockUser, ...userData };
+  },
+
+  // Cadastro de usuário
+  createUser: async (userData: CreateUserRequest): Promise<{ user: User; token: string }> => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Simula validação no backend
+    if (!userData.nome || !userData.email || !userData.idade || !userData.peso || !userData.altura) {
+      throw new Error('Todos os campos obrigatórios devem ser preenchidos');
+    }
+
+    if (userData.idade < 13 || userData.idade > 120) {
+      throw new Error('Idade deve estar entre 13 e 120 anos');
+    }
+
+    if (userData.peso < 30 || userData.peso > 300) {
+      throw new Error('Peso deve estar entre 30kg e 300kg');
+    }
+
+    if (userData.altura < 100 || userData.altura > 250) {
+      throw new Error('Altura deve estar entre 100cm e 250cm');
+    }
+
+    const newUser: User = {
+      ...userData,
+      id: Date.now().toString(),
+      dataCadastro: new Date().toISOString().split('T')[0]
+    };
+
+    return { user: newUser, token: 'mock-jwt-token' };
   },
 
   // Progresso
@@ -138,9 +131,9 @@ export const api = {
     throw new Error('Credenciais inválidas');
   },
 
-  register: async (userData: Omit<User, 'id'>): Promise<{ user: User; token: string }> => {
+  register: async (userData: Omit<User, 'id' | 'dataCadastro'>): Promise<{ user: User; token: string }> => {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    const newUser: User = { ...userData, id: Date.now().toString() };
+    const newUser: User = { ...userData, id: Date.now().toString(), dataCadastro: new Date().toISOString().split('T')[0] };
     return { user: newUser, token: 'mock-jwt-token' };
   }
 };

@@ -4,13 +4,28 @@ export interface User {
   id: string;
   nome: string;
   email: string;
-  objetivo: string;
-  pesoInicial: number;
-  pesoAtual: number;
-  pesoMeta: number;
-  altura: number;
   idade: number;
-  genero: string;
+  peso: number;
+  altura: number;
+  sexo: 'masculino' | 'feminino' | 'outro';
+  restricoesAlimentares: string[];
+  preferencias: string[];
+  nivelAtividade: 'sedentario' | 'leve' | 'moderado' | 'ativo' | 'muito-ativo';
+  objetivo: 'perder-peso' | 'ganhar-massa' | 'manter-peso' | 'melhorar-saude' | 'ganhar-forca';
+  dataCadastro: string;
+}
+
+export interface CreateUserRequest {
+  nome: string;
+  email: string;
+  idade: number;
+  peso: number;
+  altura: number;
+  sexo: 'masculino' | 'feminino' | 'outro';
+  restricoesAlimentares: string[];
+  preferencias: string[];
+  nivelAtividade: 'sedentario' | 'leve' | 'moderado' | 'ativo' | 'muito-ativo';
+  objetivo: 'perder-peso' | 'ganhar-massa' | 'manter-peso' | 'melhorar-saude' | 'ganhar-forca';
 }
 
 export interface ProgressData {

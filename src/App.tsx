@@ -13,7 +13,10 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleNavigation = (page: Page) => {
+    console.log('handleNavigation chamada com página:', page);
+    console.log('Página atual antes:', currentPage);
     setCurrentPage(page);
+    console.log('Página definida para:', page);
   };
 
   const handleLogin = () => {
@@ -33,7 +36,7 @@ const App: React.FC = () => {
       case 'login':
         return <Login onNavigate={handleNavigation} onLogin={handleLogin} />;
       case 'cadastro':
-        return <Cadastro onNavigate={handleNavigation} />;
+        return <Cadastro onNavigate={handleNavigation} onLogin={handleLogin} />;
       case 'dashboard':
         return isAuthenticated ? <Dashboard onNavigate={handleNavigation} onLogout={handleLogout} /> : <Home onNavigate={handleNavigation} />;
       case 'progresso':
