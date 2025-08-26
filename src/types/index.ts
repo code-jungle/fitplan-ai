@@ -89,7 +89,95 @@ export interface Workout {
   status: 'agendado' | 'em-andamento' | 'concluido' | 'cancelado';
 }
 
-export type Page = 'home' | 'login' | 'cadastro' | 'dashboard' | 'progresso';
+// Tipos para Planos de Dieta e Treino
+export interface DietPlan {
+  id: string;
+  nome: string;
+  objetivo: string;
+  caloriasDiarias: number;
+  refeicoes: DietMeal[];
+  hidratacao: {
+    agua: number;
+    outros: string[];
+  };
+  suplementos?: string[];
+  observacoes: string[];
+  duracao: number; // em dias
+  dificuldade: 'iniciante' | 'intermediario' | 'avancado';
+}
+
+export interface DietMeal {
+  id: string;
+  nome: string;
+  horario: string;
+  calorias: number;
+  proteinas: number;
+  carboidratos: number;
+  gorduras: number;
+  alimentos: string[];
+  preparo: string;
+  tempoPreparo: number; // em minutos
+  categoria: 'cafe' | 'lanche' | 'almoco' | 'jantar' | 'ceia';
+}
+
+export interface TrainingPlan {
+  id: string;
+  nome: string;
+  objetivo: string;
+  duracao: number; // em semanas
+  frequencia: number; // treinos por semana
+  treinos: TrainingWorkout[];
+  descanso: {
+    dias: number[];
+    recomendacoes: string[];
+  };
+  progressao: {
+    tipo: 'linear' | 'ondulante' | 'piramidal';
+    incremento: number;
+    frequencia: number; // a cada quantas semanas
+  };
+  dificuldade: 'iniciante' | 'intermediario' | 'avancado';
+}
+
+export interface TrainingWorkout {
+  id: string;
+  nome: string;
+  dia: string;
+  categoria: 'forca' | 'cardio' | 'flexibilidade' | 'hiit' | 'resistencia';
+  exercicios: TrainingExercise[];
+  duracaoTotal: number;
+  caloriasEstimadas: number;
+  equipamentos: string[];
+  aquecimento: string[];
+  alongamento: string[];
+}
+
+export interface TrainingExercise {
+  id: string;
+  nome: string;
+  series: number;
+  repeticoes: number;
+  peso?: number; // em kg
+  duracao?: number; // em segundos
+  descanso: number; // em segundos
+  tecnica: string;
+  variacoes?: string[];
+  observacoes: string[];
+}
+
+export interface GeneratedPlan {
+  id: string;
+  tipo: 'dieta' | 'treino' | 'completo';
+  objetivo: string;
+  dataGeracao: string;
+  validade: string;
+  planoDieta?: DietPlan;
+  planoTreino?: TrainingPlan;
+  recomendacoes: string[];
+  proximaAvaliacao: string;
+}
+
+export type Page = 'home' | 'login' | 'cadastro' | 'dashboard' | 'progresso' | 'planos';
 
 export interface NavigationProps {
   onNavigate: (page: Page) => void;

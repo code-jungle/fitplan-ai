@@ -25,9 +25,9 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'mint'
     },
     {
-      id: 'progresso',
-      title: 'Meus Exercícios',
-      description: 'Visualize seu plano de treino',
+      id: 'planos',
+      title: 'Meus Planos',
+      description: 'Visualize seus planos de dieta e treino',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -36,7 +36,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'lavanda'
     },
     {
-      id: 'progresso',
+      id: 'planos',
       title: 'Minhas Refeições',
       description: 'Controle sua alimentação',
       icon: (
@@ -47,7 +47,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'blue'
     },
     {
-      id: 'progresso',
+      id: 'planos',
       title: 'Meu Perfil',
       description: 'Gerencie suas informações',
       icon: (

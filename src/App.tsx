@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Cadastro from './pages/Cadastro';
 import Dashboard from './pages/Dashboard';
 import Progresso from './pages/Progresso';
+import Planos from './pages/Planos';
 import { Page } from './types';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -35,6 +36,12 @@ const App: React.FC = () => {
         return (
           <ProtectedRoute>
             <Progresso onNavigate={handleNavigation} />
+          </ProtectedRoute>
+        );
+      case 'planos':
+        return (
+          <ProtectedRoute>
+            <Planos />
           </ProtectedRoute>
         );
       default:
