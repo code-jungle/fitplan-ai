@@ -1,7 +1,7 @@
 // Serviço de API para o FitPlan AI
 // Por enquanto com dados mock, mas preparado para integração futura
 
-import { User, ProgressData, Exercise, Meal, CreateUserRequest } from '../types';
+import { User, ProgressData, Exercise, Meal, CreateUserRequest, LoginRequest, AuthResponse } from '../types';
 
 // Mock data para desenvolvimento
 const mockUser: User = {
@@ -69,8 +69,8 @@ export const api = {
       id: Date.now().toString(),
       dataCadastro: new Date().toISOString().split('T')[0]
     };
-
-    return { user: newUser, token: 'mock-jwt-token' };
+    
+    return { user: newUser, token: 'mock-jwt-token-' + Date.now() };
   },
 
   // Progresso
@@ -123,12 +123,51 @@ export const api = {
   },
 
   // Autenticação
-  login: async (email: string, password: string): Promise<{ user: User; token: string }> => {
+  login: async (credentials: LoginRequest): Promise<{ success: boolean; user?: User; token?: string; expiresAt?: string; error?: string }> => {
     await new Promise(resolve => setTimeout(resolve, 1000));
-    if (email === 'joao@example.com' && password === '123456') {
-      return { user: mockUser, token: 'mock-jwt-token' };
+    
+    // Simula validação de credenciais
+    if (credentials.email === 'joao@example.com' && credentials.senha === '123456') {
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24); // Token válido por 24 horas
+      
+      return { 
+        success: true, 
+        user: mockUser, 
+        token: 'mock-jwt-token-' + Date.now(),
+        expiresAt: expiresAt.toISOString()
+      };
+    } else if (credentials.email === 'maria@example.com' && credentials.senha === '123456') {
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+      
+      const mariaUser: User = {
+        id: '2',
+        nome: 'Maria Santos',
+        email: 'maria@example.com',
+        idade: 32,
+        peso: 62,
+        altura: 165,
+        sexo: 'feminino',
+        restricoesAlimentares: ['gluten'],
+        preferencias: ['vegano'],
+        nivelAtividade: 'ativo',
+        objetivo: 'ganhar-massa',
+        dataCadastro: '2024-01-10'
+      };
+      
+      return { 
+        success: true, 
+        user: mariaUser, 
+        token: 'mock-jwt-token-' + Date.now(),
+        expiresAt: expiresAt.toISOString()
+      };
     }
-    throw new Error('Credenciais inválidas');
+    
+    return { 
+      success: false, 
+      error: 'Email ou senha incorretos. Tente novamente.' 
+    };
   },
 
   register: async (userData: Omit<User, 'id' | 'dataCadastro'>): Promise<{ user: User; token: string }> => {

@@ -12,7 +12,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       <div className="container mx-auto max-w-4xl">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h2 className="futuristic-text text-4xl md:text-6xl mb-6 text-shadow-lg">
+          <h2 className="futuristic-text text-4xl md:text-6xl mb-6 ">
             Bem-vindo ao Futuro
           </h2>
           <p className="text-xl md:text-2xl text-white/80 font-inter max-w-2xl mx-auto">
@@ -40,12 +40,8 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              onClick={() => {
-                console.log('Botão Começar Jornada clicado!');
-                console.log('onNavigate function:', onNavigate);
-                console.log('Tentando navegar para cadastro...');
-                onNavigate('cadastro');
-                console.log('Navegação executada');
+              onClick={() => {              
+                onNavigate('cadastro');                
               }}
               className="relative z-10 cursor-pointer"
             >
@@ -54,11 +50,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <Button 
               variant="secondary" 
               size="lg" 
-              onClick={() => {
-                console.log('Botão Já tenho conta clicado!');
-                onNavigate('login');
-              }}
-              className="relative z-10 cursor-pointer"
+              onClick={() => onNavigate('login')}
             >
               Já tenho conta
             </Button>
@@ -108,7 +100,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
               </svg>
             </div>
             <h3 className="futuristic-text text-2xl md:text-3xl mb-4">
-              Plano Premium
+              Plano único
             </h3>
             <div className="mb-6">
               <div className="flex items-center justify-center space-x-2 mb-2">
@@ -119,14 +111,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             </div>
             
             <div className="space-y-3 mb-6 text-left max-w-md mx-auto">
-              <div className="flex items-center space-x-3">
-                <div className="w-5 h-5 bg-mint-400 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-white/90">7 dias de teste gratuito</span>
-              </div>
+             
               <div className="flex items-center space-x-3">
                 <div className="w-5 h-5 bg-mint-400 rounded-full flex items-center justify-center">
                   <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -143,14 +128,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                 </div>
                 <span className="text-white/90">Cancelamento a qualquer momento</span>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="w-5 h-5 bg-mint-400 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="text-white/90">Suporte prioritário</span>
-              </div>
+              
             </div>
           </div>
           
@@ -158,13 +136,12 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
             <Button 
               size="lg" 
               onClick={() => {
-                console.log('Botão Começar Teste Gratuito clicado!');
-                console.log('onNavigate function:', onNavigate);
-                console.log('Tentando navegar para cadastro...');
+                
+                
                 onNavigate('cadastro');
-                console.log('Navegação executada');
+                
               }}
-              className="relative z-10 cursor-pointer"
+              className=" relative z-10 cursor-pointer"
             >
               Começar Teste Gratuito
             </Button>

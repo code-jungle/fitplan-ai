@@ -8,11 +8,9 @@ import { UserService } from '../services/userService';
 import { NavigationProps } from '../types';
 import { FORM_OPTIONS } from '../constants/formOptions';
 
-interface CadastroProps extends NavigationProps {
-  onLogin?: () => void;
-}
+interface CadastroProps extends NavigationProps {}
 
-const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
+const Cadastro: React.FC<CadastroProps> = ({ onNavigate }) => {
   const {
     formData,
     errors,
@@ -29,33 +27,35 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Formulário submetido:', formData);
     setGeneralError('');
     setSuccessMessage('');
 
     if (!validateForm()) {
+      console.log('Validação falhou');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+      console.log('Chamando UserService.cadastrarUsuario...');
       const result = await UserService.cadastrarUsuario(formData);
+      console.log('Resultado do cadastro:', result);
 
       if (result.success) {
         setSuccessMessage('Usuário cadastrado com sucesso! Redirecionando...');
         
         // Simula delay para mostrar mensagem de sucesso
         setTimeout(() => {
-          if (onLogin) {
-            onLogin();
-          } else {
-            onNavigate('dashboard');
-          }
+          console.log('Redirecionando para dashboard...');
+          onNavigate('dashboard');
         }, 2000);
       } else {
         setGeneralError(result.error || 'Erro ao cadastrar usuário');
       }
     } catch (error) {
+      console.error('Erro durante cadastro:', error);
       setGeneralError('Erro inesperado ao cadastrar usuário');
     } finally {
       setIsSubmitting(false);
@@ -63,18 +63,18 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
   };
 
   const handleReset = () => {
+    console.log('Resetando formulário...');
     resetForm();
     setGeneralError('');
     setSuccessMessage('');
+    console.log('Formulário resetado com sucesso');
   };
-
-
 
   return (
     <div className="min-h-screen pt-24 pb-8 px-4">
       <div className="container mx-auto max-w-4xl">
         <div className="text-center mb-8">
-          <h1 className="futuristic-text text-4xl md:text-5xl mb-4 text-shadow-lg">
+          <h1 className="futuristic-text text-4xl md:text-5xl mb-4">
             Comece Sua Jornada
           </h1>
           <p className="text-xl text-white/80 font-inter max-w-2xl mx-auto">
@@ -109,7 +109,7 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                     type="text"
                     value={formData.nome}
                     onChange={(e) => updateField('nome', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                     placeholder="Digite seu nome completo"
                   />
                 </FormField>
@@ -119,7 +119,7 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                     placeholder="seu@email.com"
                   />
                 </FormField>
@@ -129,7 +129,7 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                     type="number"
                     value={formData.idade || ''}
                     onChange={(e) => updateField('idade', parseInt(e.target.value) || 0)}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                     placeholder="25"
                     min="13"
                     max="120"
@@ -140,13 +140,14 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                   <select
                     value={formData.sexo}
                     onChange={(e) => updateField('sexo', e.target.value)}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                   >
-                                      {FORM_OPTIONS.sexo.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
+                    <option value="" className="bg-slate-800 text-white">Selecione o sexo</option>
+                    {FORM_OPTIONS.sexo.map(option => (
+                      <option key={option.value} value={option.value} className="bg-slate-800 text-white">
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
                 </FormField>
               </div>
@@ -164,7 +165,7 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                     type="number"
                     value={formData.peso || ''}
                     onChange={(e) => updateField('peso', parseFloat(e.target.value) || 0)}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                     placeholder="70.5"
                     step="0.1"
                     min="30"
@@ -177,7 +178,7 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                     type="number"
                     value={formData.altura || ''}
                     onChange={(e) => updateField('altura', parseInt(e.target.value) || 0)}
-                    className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                     placeholder="175"
                     min="100"
                     max="250"
@@ -196,10 +197,11 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                 <select
                   value={formData.nivelAtividade}
                   onChange={(e) => updateField('nivelAtividade', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                  className="w-full px-4 py-3 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                 >
+                  <option value="" className="bg-slate-800 text-white">Selecione o nível de atividade</option>
                   {FORM_OPTIONS.nivelAtividade.map(option => (
-                    <option key={option.value} value={option.value}>
+                    <option key={option.value} value={option.value} className="bg-slate-800 text-white">
                       {option.label}
                     </option>
                   ))}
@@ -210,10 +212,11 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                 <select
                   value={formData.objetivo}
                   onChange={(e) => updateField('objetivo', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
+                  className="w-full px-4 py-3 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-mint-300 focus:border-transparent transition-all duration-300"
                 >
+                  <option value="" className="bg-slate-800 text-white">Selecione o objetivo</option>
                   {FORM_OPTIONS.objetivo.map(option => (
-                    <option key={option.value} value={option.value}>
+                    <option key={option.value} value={option.value} className="bg-slate-800 text-white">
                       {option.label}
                     </option>
                   ))}
@@ -227,20 +230,20 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
                 Restrições e Preferências
               </h3>
               
-                             <MultiSelectField
-                 label="Restrições Alimentares"
-                 options={FORM_OPTIONS.restricoesAlimentares}
-                 selectedValues={formData.restricoesAlimentares}
-                 onChange={(values) => updateField('restricoesAlimentares', values)}
-                 className="mb-6"
-               />
+              <MultiSelectField
+                label="Restrições Alimentares"
+                options={FORM_OPTIONS.restricoesAlimentares}
+                selectedValues={formData.restricoesAlimentares}
+                onChange={(values) => updateField('restricoesAlimentares', values)}
+                className="mb-6"
+              />
 
-               <MultiSelectField
-                 label="Preferências de Exercício e Dieta"
-                 options={FORM_OPTIONS.preferencias}
-                 selectedValues={formData.preferencias}
-                 onChange={(values) => updateField('preferencias', values)}
-               />
+              <MultiSelectField
+                label="Preferências de Exercício e Dieta"
+                options={FORM_OPTIONS.preferencias}
+                selectedValues={formData.preferencias}
+                onChange={(values) => updateField('preferencias', values)}
+              />
             </div>
 
             {/* Botões de Ação */}
@@ -264,6 +267,18 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate, onLogin }) => {
               >
                 Limpar
               </Button>
+              
+              {/* Botão de teste simples */}
+              <button
+                type="button"
+                onClick={() => {
+                  console.log('=== BOTÃO DE TESTE CLICADO ===');
+                  alert('Botão de teste funcionando!');
+                }}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold"
+              >
+                Teste
+              </button>
             </div>
 
             {/* Link para Login */}

@@ -99,3 +99,21 @@ export interface AuthProps extends NavigationProps {
   onLogin?: () => void;
   onLogout?: () => void;
 }
+
+export interface LoginRequest {
+  email: string;
+  senha: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+  expiresAt: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+}

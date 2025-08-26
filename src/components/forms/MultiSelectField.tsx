@@ -39,10 +39,10 @@ export const MultiSelectField: React.FC<MultiSelectFieldProps> = ({
             key={option.value}
             type="button"
             onClick={() => handleToggle(option.value)}
-            className={`p-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`p-2 rounded-lg text-sm font-medium transition-all duration-200 border ${
               selectedValues.includes(option.value)
-                ? 'bg-mint-500 text-white shadow-lg'
-                : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
+                ? 'bg-mint-500 text-white border-mint-500 shadow-lg'
+                : 'bg-slate-800 text-white/90 hover:bg-slate-700 hover:text-white border-white/20'
             }`}
           >
             {option.label}

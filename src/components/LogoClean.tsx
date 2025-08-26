@@ -22,8 +22,8 @@ const LogoClean: React.FC<LogoCleanProps> = ({
       {/* Clean Text Logo */}
       <div className="flex items-center">
                  <h1 className={`font-sans-serif font-bold ${textSizes[size]} text-shadow-lg leading-none`}>
-          <span className="text-white">FitPlan</span>
-          <span className="ml-2 bg-gradient-to-b from-lavanda-400 to-lavanda-300 bg-clip-text text-transparent">AI</span>
+          <span className="text-white futuristic-text text-4xl md:text-5xl mb-4 ">FitPlan</span>
+          <span className=" from-pastel mint-300   text-transparent futuristic-text text-4xl md:text-5xl mb-4 ">AI</span>
         </h1>
       </div>
     </div>

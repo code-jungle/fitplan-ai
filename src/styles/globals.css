@@ -68,3 +68,43 @@
     animation: glow 2s ease-in-out infinite alternate;
   }
 }
+
+/* Estilos para dropdowns e campos de formulário */
+select {
+  background-color: rgb(30 41 59) !important; /* slate-800 */
+  color: white !important;
+}
+
+select option {
+  background-color: rgb(30 41 59) !important; /* slate-800 */
+  color: white !important;
+}
+
+select option:hover {
+  background-color: rgb(51 65 85) !important; /* slate-700 */
+}
+
+/* Melhorar visibilidade dos campos de input */
+input, select {
+  background-color: rgb(30 41 59) !important; /* slate-800 */
+  color: white !important;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Garantir que botões sejam clicáveis */
+button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Garantir que formulários sejam funcionais */
+form {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10 !important;
+}

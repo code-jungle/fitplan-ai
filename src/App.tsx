@@ -7,26 +7,14 @@ import Cadastro from './pages/Cadastro';
 import Dashboard from './pages/Dashboard';
 import Progresso from './pages/Progresso';
 import { Page } from './types';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleNavigation = (page: Page) => {
-    console.log('handleNavigation chamada com página:', page);
-    console.log('Página atual antes:', currentPage);
     setCurrentPage(page);
-    console.log('Página definida para:', page);
-  };
-
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-    setCurrentPage('dashboard');
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setCurrentPage('home');
   };
 
   const renderPage = () => {
@@ -34,26 +22,36 @@ const App: React.FC = () => {
       case 'home':
         return <Home onNavigate={handleNavigation} />;
       case 'login':
-        return <Login onNavigate={handleNavigation} onLogin={handleLogin} />;
+        return <Login onNavigate={handleNavigation} />;
       case 'cadastro':
-        return <Cadastro onNavigate={handleNavigation} onLogin={handleLogin} />;
+        return <Cadastro onNavigate={handleNavigation} />;
       case 'dashboard':
-        return isAuthenticated ? <Dashboard onNavigate={handleNavigation} onLogout={handleLogout} /> : <Home onNavigate={handleNavigation} />;
+        return (
+          <ProtectedRoute>
+            <Dashboard onNavigate={handleNavigation} />
+          </ProtectedRoute>
+        );
       case 'progresso':
-        return isAuthenticated ? <Progresso onNavigate={handleNavigation} /> : <Home onNavigate={handleNavigation} />;
+        return (
+          <ProtectedRoute>
+            <Progresso onNavigate={handleNavigation} />
+          </ProtectedRoute>
+        );
       default:
         return <Home onNavigate={handleNavigation} />;
     }
   };
 
   return (
-    <div className="App min-h-screen bg-gradient-to-br from-slate-900 via-graphite-900 to-slate-800">
-      <Header />
-      <div className="pb-20 pt-24">
-        {renderPage()}
+    <AuthProvider>
+      <div className="App min-h-screen bg-gradient-to-br from-slate-900 via-graphite-900 to-slate-800">
+        <Header />
+        <div className="pb-20 pt-24">
+          {renderPage()}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </AuthProvider>
   );
 };
 

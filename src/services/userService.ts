@@ -19,15 +19,30 @@ export class UserService {
           error: validationResult.error
         };
       }
-
+      
       // Chama a API
       const result = await api.createUser(userData);
       
-      return {
-        success: true,
-        user: result.user,
-        token: result.token
-      };
+      if (result && result.user && result.token) {
+        // Salvar dados da sessão automaticamente após cadastro
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 24);
+        
+        localStorage.setItem('fitplan_user', JSON.stringify(result.user));
+        localStorage.setItem('fitplan_token', result.token);
+        localStorage.setItem('fitplan_expires', expiresAt.toISOString());
+        
+        return {
+          success: true,
+          user: result.user,
+          token: result.token
+        };
+      } else {
+        return {
+          success: false,
+          error: 'Resposta inválida da API'
+        };
+      }
     } catch (error) {
       return {
         success: false,
