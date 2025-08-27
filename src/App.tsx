@@ -7,6 +7,8 @@ import Cadastro from './pages/Cadastro';
 import Dashboard from './pages/Dashboard';
 import Progresso from './pages/Progresso';
 import Planos from './pages/Planos';
+import Refeicoes from './pages/Refeicoes';
+import Perfil from './pages/Perfil';
 import { Page } from './types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -57,6 +59,18 @@ const AppContent: React.FC = () => {
         return (
           <ProtectedRoute>
             <Planos onNavigate={handleNavigation} />
+          </ProtectedRoute>
+        );
+      case 'refeicoes':
+        return (
+          <ProtectedRoute>
+            <Refeicoes onNavigate={handleNavigation} />
+          </ProtectedRoute>
+        );
+      case 'perfil':
+        return (
+          <ProtectedRoute>
+            <Perfil onNavigate={handleNavigation} />
           </ProtectedRoute>
         );
       default:

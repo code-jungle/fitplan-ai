@@ -68,7 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Header do Dashboard */}
         <div className="text-center mb-12">
           <h1 className="futuristic-text text-4xl md:text-5xl mb-4 ">
-            Bem-vindo, {user.nome}!
+            Olá, {user.nome}!
           </h1>
           <p className="text-xl text-white/80 font-inter max-w-2xl mx-auto">
             Seu dashboard personalizado de saúde e fitness

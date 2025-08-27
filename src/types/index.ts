@@ -120,6 +120,100 @@ export interface DietMeal {
   categoria: 'cafe' | 'lanche' | 'almoco' | 'jantar' | 'ceia';
 }
 
+// Tipos para a tela de refeições
+export interface MealItem {
+  id: string;
+  nome: string;
+  quantidade: string;
+  calorias: number;
+  proteinas: number;
+  carboidratos: number;
+  gorduras: number;
+  observacoes?: string;
+}
+
+export interface UserMeal {
+  id: string;
+  nome: string;
+  categoria: 'cafe' | 'lanche' | 'almoco' | 'jantar' | 'ceia';
+  horario: string;
+  data: string;
+  itens: MealItem[];
+  caloriasTotais: number;
+  proteinasTotais: number;
+  carboidratosTotais: number;
+  gordurasTotais: number;
+  observacoes?: string;
+  status: 'planejada' | 'consumida' | 'pulada';
+}
+
+export interface CreateMealRequest {
+  nome: string;
+  categoria: 'cafe' | 'lanche' | 'almoco' | 'jantar' | 'ceia';
+  horario: string;
+  data: string;
+  itens: Omit<MealItem, 'id'>[];
+  observacoes?: string;
+}
+
+export interface UpdateMealRequest extends Partial<CreateMealRequest> {
+  id: string;
+}
+
+// Tipos para o perfil do usuário
+export interface UserProfile extends User {
+  avatar?: string;
+  bio?: string;
+  telefone?: string;
+  endereco?: {
+    cidade: string;
+    estado: string;
+    pais: string;
+  };
+  redesSociais?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+  };
+  configuracoes?: {
+    notificacoes: boolean;
+    privacidade: 'publico' | 'privado' | 'amigos';
+    tema: 'claro' | 'escuro' | 'auto';
+  };
+}
+
+export interface UpdateProfileRequest {
+  nome?: string;
+  idade?: number;
+  peso?: number;
+  altura?: number;
+  sexo?: 'masculino' | 'feminino' | 'outro';
+  objetivo?: 'perder-peso' | 'ganhar-massa' | 'manter-peso' | 'melhorar-saude' | 'ganhar-forca';
+  bio?: string;
+  telefone?: string;
+  avatar?: string;
+  endereco?: {
+    cidade: string;
+    estado: string;
+    pais: string;
+  };
+  redesSociais?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+  };
+}
+
+export interface ProfileStats {
+  diasAtivo: number;
+  treinosCompletos: number;
+  refeicoesRegistradas: number;
+  pesoInicial: number;
+  pesoAtual: number;
+  variacaoPeso: number;
+  metaProxima: string;
+}
+
 export interface TrainingPlan {
   id: string;
   nome: string;
@@ -177,7 +271,7 @@ export interface GeneratedPlan {
   proximaAvaliacao: string;
 }
 
-export type Page = 'home' | 'login' | 'cadastro' | 'dashboard' | 'progresso' | 'planos';
+export type Page = 'home' | 'login' | 'cadastro' | 'dashboard' | 'progresso' | 'planos' | 'refeicoes' | 'perfil';
 
 export interface NavigationProps {
   onNavigate: (page: Page) => void;
