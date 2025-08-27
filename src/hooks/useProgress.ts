@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ProgressData } from '../types';
 import { api } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import { usePlans } from './usePlans';
 
 export interface UpdateProgressData {
   peso: number;

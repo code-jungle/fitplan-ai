@@ -4,11 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { PlanSummary, DietPlanDetails, TrainingPlanDetails, PlanAdjustmentNotification } from '../components/plans';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import { GeneratedPlan } from '../types';
+import { GeneratedPlan, NavigationProps } from '../types';
 
 type ViewMode = 'summary' | 'diet' | 'training';
 
-const Planos: React.FC = () => {
+interface PlanosProps extends NavigationProps {}
+
+const Planos: React.FC<PlanosProps> = ({ onNavigate }) => {
   const { user } = useAuth();
   const {
     currentPlan,
@@ -311,6 +313,16 @@ const Planos: React.FC = () => {
           <p className="text-white/60 text-lg">
             Planos personalizados de dieta e treino para alcançar seus objetivos
           </p>
+          <div className="mt-6">
+            <Button
+              onClick={() => onNavigate('dashboard')}
+              variant="secondary"
+              size="md"
+              className="px-6"
+            >
+              ← Voltar ao Dashboard
+            </Button>
+          </div>
         </div>
 
         {/* Ações Principais */}

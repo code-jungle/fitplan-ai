@@ -36,7 +36,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'lavanda'
     },
     {
-      id: 'planos',
+      id: 'progresso',
       title: 'Minhas Refeições',
       description: 'Controle sua alimentação',
       icon: (
@@ -47,7 +47,7 @@ const QuickActionsCard: React.FC<QuickActionsCardProps> = ({
       color: 'blue'
     },
     {
-      id: 'planos',
+      id: 'progresso',
       title: 'Meu Perfil',
       description: 'Gerencie suas informações',
       icon: (

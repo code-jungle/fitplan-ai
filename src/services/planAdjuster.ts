@@ -481,8 +481,8 @@ export class PlanAdjuster {
     return recommendations;
   }
   
-  private static increaseDifficulty(difficulty: string): string {
-    const levels = ['iniciante', 'intermediario', 'avancado'];
+  private static increaseDifficulty(difficulty: 'iniciante' | 'intermediario' | 'avancado'): 'iniciante' | 'intermediario' | 'avancado' {
+    const levels: Array<'iniciante' | 'intermediario' | 'avancado'> = ['iniciante', 'intermediario', 'avancado'];
     const currentIndex = levels.indexOf(difficulty);
     return currentIndex < levels.length - 1 ? levels[currentIndex + 1] : difficulty;
   }

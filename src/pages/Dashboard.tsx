@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDashboard } from '../hooks/useDashboard';
 import { NavigationProps } from '../types';
 import { UpdateProgressRequest } from '../services/dashboardService';
+import NotificationSettings from '../components/NotificationSettings';
 
 // Componentes do Dashboard
 import DashboardLoading from '../components/dashboard/DashboardLoading';
@@ -137,6 +138,9 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           user={user}
           className="mb-8"
         />
+
+        {/* Configurações de Notificações */}
+        <NotificationSettings className="mb-8" />
       </div>
 
       {/* Modal de Atualização de Progresso */}

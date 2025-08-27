@@ -80,6 +80,16 @@ const Cadastro: React.FC<CadastroProps> = ({ onNavigate }) => {
           <p className="text-xl text-white/80 font-inter max-w-2xl mx-auto">
             Preencha seus dados para criarmos um plano personalizado de saúde e fitness
           </p>
+          <div className="mt-6">
+            <Button
+              onClick={() => onNavigate('home')}
+              variant="secondary"
+              size="md"
+              className="px-6"
+            >
+              ← Voltar para Home
+            </Button>
+          </div>
         </div>
 
         <Card gradient className="mb-8">

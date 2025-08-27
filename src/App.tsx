@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -8,15 +8,30 @@ import Dashboard from './pages/Dashboard';
 import Progresso from './pages/Progresso';
 import Planos from './pages/Planos';
 import { Page } from './types';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
-const App: React.FC = () => {
+// Componente interno que usa o contexto de autenticação
+const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('home');
+  const { isAuthenticated, isLoading } = useAuth();
 
   const handleNavigation = (page: Page) => {
     setCurrentPage(page);
   };
+
+  // Verificar autenticação e redirecionar automaticamente
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated && currentPage === 'home') {
+        // Se estiver logado e estiver na home, redirecionar para dashboard
+        setCurrentPage('dashboard');
+      } else if (!isAuthenticated && (currentPage === 'dashboard' || currentPage === 'progresso' || currentPage === 'planos')) {
+        // Se não estiver logado e tentar acessar páginas protegidas, redirecionar para home
+        setCurrentPage('home');
+      }
+    }
+  }, [isAuthenticated, isLoading, currentPage]);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -41,7 +56,7 @@ const App: React.FC = () => {
       case 'planos':
         return (
           <ProtectedRoute>
-            <Planos />
+            <Planos onNavigate={handleNavigation} />
           </ProtectedRoute>
         );
       default:
@@ -50,14 +65,21 @@ const App: React.FC = () => {
   };
 
   return (
-    <AuthProvider>
-      <div className="App min-h-screen bg-gradient-to-br from-slate-900 via-graphite-900 to-slate-800">
-        <Header />
-        <div className="pb-20 pt-24">
-          {renderPage()}
-        </div>
-        <Footer />
+    <div className="App min-h-screen bg-gradient-to-br from-slate-900 via-graphite-900 to-slate-800">
+      <Header />
+      <div className="pb-20 pt-24">
+        {renderPage()}
       </div>
+      <Footer />
+    </div>
+  );
+};
+
+// Componente principal que envolve tudo com o AuthProvider
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
     </AuthProvider>
   );
 };

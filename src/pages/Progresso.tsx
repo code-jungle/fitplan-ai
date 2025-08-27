@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useProgress, UpdateProgressData } from '../hooks/useProgress';
+import { usePlans } from '../hooks/usePlans';
 import { useAuth } from '../contexts/AuthContext';
 import { NavigationProps } from '../types';
 import { ProgressData } from '../types';
@@ -11,6 +12,9 @@ import {
   UpdateProgressForm,
   ProgressHistory
 } from '../components/progress';
+
+// Componentes de Planos
+import { PlanAdjustmentNotification } from '../components/plans';
 
 interface ProgressoProps extends NavigationProps {}
 
